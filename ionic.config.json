@@ -1,0 +1,7 @@
+{
+  "name": "Shlokas",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
