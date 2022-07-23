@@ -1,9 +1,9 @@
 <template>
     <div class="root">
-        <ion-img src="empty-inbox.png" class="img" />
-
+        <ion-img src="inbox-empty.png" class="img" />
         <div class="text">
-            You have no verses yet, please add one to learn
+            <div>Your inbox is empty.</div>
+            <div>Tap to <b>add new verses</b> to your inbox.</div>
         </div>
     </div>
 </template>
@@ -15,16 +15,14 @@ import { IonImg } from '@ionic/vue';
 <style scoped>
 .root {
     display: flex;
-
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 .text {
-    margin: 14vw;
+    margin: 20px;
 }
 .img {
-    width: 50%;
-
+    max-width: 50%;
 }
 </style>

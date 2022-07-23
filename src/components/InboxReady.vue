@@ -1,9 +1,11 @@
 <template>
     <div class="root">
-        <ion-img src="swipe.png" class="img" />
-
+        <ion-img src="inbox-ready.png" class="img" />
         <div class="text">
-            You've added verse. Swipe to study it. Or click to add one more.
+            <div>You have added new verses.</div>
+            <div><b>Swipe</b> left and right to review.</div>
+            <div><b>Tick</b> cards that you memorized.</div>
+            <div>Tap to add new verses.</div>
         </div>
     </div>
 </template>
@@ -15,16 +17,14 @@ import { IonImg } from '@ionic/vue';
 <style scoped>
 .root {
     display: flex;
-
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 .text {
-    margin: 14vw;
+    margin: 20px;
 }
 .img {
-    width: 50%;
-
+    max-width: 50%;
 }
 </style>

@@ -5,17 +5,12 @@
         <ion-title>New Verses</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">New Verses</ion-title>
-        </ion-toolbar>
-      </ion-header>
 
-      <swiper>
+    <ion-content :fullscreen="true">
+      <swiper effect="cards">
         <swiper-slide>
-          <EmptyInbox @click="openModal" v-if="slides.length == 0" />
-          <FullInbox @click="openModal" v-else />
+          <InboxEmpty v-if="noCardsToReview" @click="openModal" />
+          <InboxReady v-else @click="openModal" />
         </swiper-slide>
 
         <swiper-slide v-for="slide, idx in slides" :key="idx">
@@ -28,15 +23,17 @@
 
 <script lang="ts" setup>
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, modalController } from '@ionic/vue';
-import { ref, Ref } from 'vue'
+import { ref, computed, Ref } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue';
-import AddVerseDialog from '@/components/AddVerseDialog.vue'
+import InboxAddVerseDialog from '@/components/InboxAddVerseDialog.vue'
 import { verses } from '@/lib/verses'
-import 'swiper/css';
-import '@ionic/vue/css/ionic-swiper.css';
 import VerseView from '@/components/VerseView.vue';
-import EmptyInbox from '@/components/EmptyInbox.vue';
-import FullInbox from '@/components/FullInbox.vue';
+import InboxEmpty from '@/components/InboxEmpty.vue';
+import InboxReady from '@/components/InboxReady.vue';
+
+import 'swiper/css';
+import "swiper/css/effect-cards";
+import '@ionic/vue/css/ionic-swiper.css';
 
 interface t {
   text: string
@@ -47,7 +44,7 @@ const slides: Ref<t[]> = ref([])
 
 async function openModal() {
   const modal = await modalController.create({
-    component: AddVerseDialog,
+    component: InboxAddVerseDialog,
   });
   modal.present();
 
@@ -62,6 +59,7 @@ async function openModal() {
   }
 }
 
+const noCardsToReview = computed(() => slides.value.length === 0)
 </script>
 
 <style>
