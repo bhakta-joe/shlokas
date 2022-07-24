@@ -5,16 +5,22 @@
       {{ line }}
     </div>
     <br/>
-    <ion-checkbox></ion-checkbox>
+    <ion-checkbox @ion-change="onMarkChanged"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from 'vue'
+import { defineProps, defineEmits } from 'vue'
 import { IonCheckbox } from '@ionic/vue';
+
 const props = defineProps<{text: string, number:string}>()
+const emit = defineEmits(['marked'])
 
 const text = props.text.split("\n")
+
+function onMarkChanged() {
+  emit('marked', true)
+}
 </script>
 
 <style scoped>

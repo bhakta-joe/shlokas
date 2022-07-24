@@ -9,12 +9,19 @@
     <ion-content :fullscreen="true">
       <swiper effect="cards">
         <swiper-slide>
-          <InboxEmpty v-if="noCardsToReview" @click="openModal" />
+          <InboxEmpty v-if="inboxStore.isEmpty" @click="openModal" />
           <InboxReady v-else @click="openModal" />
         </swiper-slide>
 
-        <swiper-slide v-for="slide, idx in slides" :key="idx">
-          <VerseView :text="slide.text" :number="slide.number" />
+        <swiper-slide
+          v-for="card in inboxStore.readyForReview"
+          :key="card.id"
+        >
+          <VerseView
+            :number="card.title"
+            :text="card.content"
+            @marked="onCardMarked(card.id, card.title)"
+          />
         </swiper-slide>
       </swiper>
     </ion-content>
@@ -23,24 +30,32 @@
 
 <script lang="ts" setup>
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, modalController } from '@ionic/vue';
-import { ref, computed, Ref } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import InboxAddVerseDialog from '@/components/InboxAddVerseDialog.vue'
 import { verses } from '@/lib/verses'
 import VerseView from '@/components/VerseView.vue';
 import InboxEmpty from '@/components/InboxEmpty.vue';
 import InboxReady from '@/components/InboxReady.vue';
+import { useInboxStore } from '@/stores/inbox'
+import { useReviewStore } from '@/stores/review'
 
 import 'swiper/css';
 import "swiper/css/effect-cards";
 import '@ionic/vue/css/ionic-swiper.css';
 
-interface t {
-  text: string
-  number: string
-}
+const inboxStore = useInboxStore()
+const reviewStore = useReviewStore()
 
-const slides: Ref<t[]> = ref([])
+function onCardMarked(cardId: string, verse: string) {
+  inboxStore.mark(cardId)
+  const isLastOne = inboxStore.isAllReviewdByVerse(verse)
+  if (isLastOne) {
+    reviewStore.addCard(verse)
+    reviewStore.addCard(verse)
+    reviewStore.addCard(verse)
+    reviewStore.addCard(verse)
+  }
+}
 
 async function openModal() {
   const modal = await modalController.create({
@@ -53,13 +68,11 @@ async function openModal() {
   if (role === 'confirm') {
     const verse = verses.find(x => x.number == data)
     if (verse) {
-      slides.value.push({ text: verse.text, number: verse.number })
-      slides.value.push({ text: verse.translation, number: verse.number })
+      inboxStore.addCard(verse.number, verse.text)
+      inboxStore.addCard(verse.number, verse.translation)
     }
   }
 }
-
-const noCardsToReview = computed(() => slides.value.length === 0)
 </script>
 
 <style>
