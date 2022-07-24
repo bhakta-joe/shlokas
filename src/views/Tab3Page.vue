@@ -1,29 +1,32 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Tab 3</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Tab 3</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      
-      <ExploreContainer name="Tab 3 page" />
-    </ion-content>
+      <GameCardsStack
+        :cards="visibleCards"
+        @cardAccepted="handleCardAccepted"
+        @cardRejected="handleCardRejected"
+        @cardSkipped="handleCardSkipped"
+        @hideCard="removeCardFromDeck"
+      />
   </ion-page>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/vue';
-import ExploreContainer from '@/components/ExploreContainer.vue';
+import GameCardsStack from '@/components/deck/GameCardsStack.vue'
+import { ref } from 'vue'
 
-export default defineComponent({
-  name: 'Tab3Page',
-  components: { ExploreContainer, IonHeader, IonToolbar, IonTitle, IonContent, IonPage }
-});
+const visibleCards = ref(["Test", "Vue.js", "Webpack"])
+
+function handleCardAccepted() {
+  console.log("handleCardAccepted");
+}
+function handleCardRejected() {
+  console.log("handleCardRejected");
+}
+function handleCardSkipped() {
+  console.log("handleCardSkipped");
+}
+function removeCardFromDeck() {
+  visibleCards.value.shift();
+}
 </script>
