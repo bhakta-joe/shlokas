@@ -14,8 +14,8 @@
         <ion-tab-button tab="tab2" href="/tabs/tab2">
           <ion-icon :icon="fileTrayFullOutline" />
           <ion-label>Review</ion-label>
-          <ion-badge v-if="reviewStore.cards.length">
-            {{ reviewStore.cards.length }}
+          <ion-badge v-if="reviewStore.readyForReview.length">
+            {{ reviewStore.readyForReview.length }}
           </ion-badge>
         </ion-tab-button>
 

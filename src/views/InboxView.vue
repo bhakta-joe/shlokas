@@ -50,10 +50,12 @@ function onCardMarked(cardId: string, verse: string) {
   inboxStore.mark(cardId)
   const isLastOne = inboxStore.isAllReviewdByVerse(verse)
   if (isLastOne) {
-    reviewStore.addCard(verse)
-    reviewStore.addCard(verse)
-    reviewStore.addCard(verse)
-    reviewStore.addCard(verse)
+    reviewStore.addCard(verse, "text:number")
+    reviewStore.addCard(verse, "translation:number")
+    reviewStore.addCard(verse, "number:text")
+    reviewStore.addCard(verse, "number:translation")
+    reviewStore.addCard(verse, "translation:text")
+    reviewStore.addCard(verse, "text:translation")
   }
 }
 
