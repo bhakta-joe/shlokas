@@ -23,8 +23,6 @@ const classes = ref([
 
 
 watch(() => props.visible, (_, value) => {
-    // console.log('11')
-    // if (value) {
     console.log('her')
     classes.value = ['in']
     // }
@@ -32,13 +30,6 @@ watch(() => props.visible, (_, value) => {
 
 onMounted(() => {
     interact(card.value as Target).draggable({
-        // origin: 'self',
-        // inertia: true,
-        // modifiers: [
-        //     interact.modifiers.restrict({
-        //         restriction: 'self'
-        //     })
-        // ],
         listeners: {
             move(event) {
                 var target = event.target

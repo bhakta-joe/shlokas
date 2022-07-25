@@ -1,19 +1,32 @@
 <template>
   <ion-page>
-      <VerseCard
-        v-for="card, idx in cards"
-        :key="card"
-        :visible="idx===0"
-        :index="-idx"
-        @out="out"
-      >
-        {{ card }}
-      </VerseCard>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Review</ion-title>
+        <ion-buttons slot="start">
+                <ion-button color="medium">
+          <ion-badge color="primary">11</ion-badge>
+                </ion-button>
+        </ion-buttons>
+
+        <ion-progress-bar :value=".4"></ion-progress-bar>
+      </ion-toolbar>
+    </ion-header>
+
+    <VerseCard
+      v-for="card, idx in cards"
+      :key="card"
+      :visible="idx === 0"
+      :index="-idx"
+      @out="out"
+    >
+      {{ card }}
+    </VerseCard>
   </ion-page>
 </template>
 
 <script lang="ts" setup>
-import { IonPage } from '@ionic/vue';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonBadge, IonProgressBar } from '@ionic/vue';
 import VerseCard from '@/components/cards/VerseCard.vue';
 import { ref } from 'vue'
 
