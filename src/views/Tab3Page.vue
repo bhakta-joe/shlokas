@@ -1,29 +1,27 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Tab 3</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Tab 3</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      
-      <ExploreContainer name="Tab 3 page" />
-    </ion-content>
+      <VerseCard
+        v-for="card, idx in cards"
+        :key="card"
+        :visible="idx===0"
+        :index="-idx"
+        @out="out"
+      >
+        {{ card }}
+      </VerseCard>
   </ion-page>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/vue';
-import ExploreContainer from '@/components/ExploreContainer.vue';
+<script lang="ts" setup>
+import { IonPage } from '@ionic/vue';
+import VerseCard from '@/components/cards/VerseCard.vue';
+import { ref } from 'vue'
 
-export default defineComponent({
-  name: 'Tab3Page',
-  components: { ExploreContainer, IonHeader, IonToolbar, IonTitle, IonContent, IonPage }
-});
+const cards = ref([
+  'card1', 'card2', 'card3'
+])
+
+function out() {
+  setTimeout(() => cards.value.splice(0, 1), 500)
+}
 </script>
