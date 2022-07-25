@@ -1,25 +1,16 @@
 <template>
   <ion-page>
-    <ion-header>
+    <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>Review</ion-title>
-        <ion-buttons slot="start">
-                <ion-button color="medium">
+        <ion-title>
+          <ion-badge color="success">{{ cards.length }}</ion-badge>&nbsp;
           <ion-badge color="primary">11</ion-badge>
-                </ion-button>
-        </ion-buttons>
-
-        <ion-progress-bar :value=".4"></ion-progress-bar>
+        </ion-title>
+        <ion-progress-bar :value="1-cards.length/3"></ion-progress-bar>
       </ion-toolbar>
     </ion-header>
 
-    <VerseCard
-      v-for="card, idx in cards"
-      :key="card"
-      :visible="idx === 0"
-      :index="-idx"
-      @out="out"
-    >
+    <VerseCard v-for="card, idx in cards" :key="card" :visible="idx === 0" :index="-idx" @out="out">
       {{ card }}
     </VerseCard>
   </ion-page>
