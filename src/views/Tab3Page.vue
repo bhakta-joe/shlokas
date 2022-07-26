@@ -3,29 +3,53 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-title>
-          <ion-badge color="success">{{ cards.length }}</ion-badge>&nbsp;
-          <ion-badge color="primary">11</ion-badge>
+          <ion-badge>{{ cards.length }}</ion-badge>&nbsp;
         </ion-title>
-        <ion-progress-bar :value="1-cards.length/3"></ion-progress-bar>
+        <ion-progress-bar :value="progress"/>
       </ion-toolbar>
     </ion-header>
 
-    <VerseCard v-for="card, idx in cards" :key="card" :visible="idx === 0" :index="-idx" @out="out">
-      {{ card }}
-    </VerseCard>
+    <ion-content
+      :scroll-events="false"
+      :scroll-y="false"
+      :scroll-x="false"
+    >
+      <VerseCard
+        v-for="card, idx in cards"
+        :key="card.id"
+        :visible="card.visible"
+        :index="reviewCount-idx"
+        @reviewed="out"
+      >
+        Card #{{ card.id }} {{ card.visible }}
+      </VerseCard>
+    </ion-content>
   </ion-page>
 </template>
 
 <script lang="ts" setup>
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonBadge, IonProgressBar } from '@ionic/vue';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonBadge, IonProgressBar, IonContent } from '@ionic/vue';
 import VerseCard from '@/components/cards/VerseCard.vue';
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
-const cards = ref([
-  'card1', 'card2', 'card3'
+interface ReviewCardViewModel {
+  id: string
+  visible: boolean
+}
+
+const progress = computed(() => 1 - cards.value.length / reviewCount)
+
+const cards = ref<ReviewCardViewModel[]>([
+  { id: '1', visible: true },
+  { id: '2', visible: false },
+  { id: '3', visible: false },
 ])
+const reviewCount = cards.value.length
 
 function out() {
   setTimeout(() => cards.value.splice(0, 1), 500)
+  if (cards.value.length > 1) {
+    cards.value[1].visible = true
+  }
 }
 </script>

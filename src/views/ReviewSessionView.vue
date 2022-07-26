@@ -1,61 +1,137 @@
 <template>
   <ion-page>
-    <ion-header>
+    <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>Review</ion-title>
+        <ion-title>
+          <ion-badge>{{ cards.length }}</ion-badge>&nbsp;
+        </ion-title>
+        <ion-progress-bar :value="progress"/>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Review</ion-title>
-        </ion-toolbar>
-      </ion-header>
 
-      <VerseQAView
-        :question="question"
-        :frontSide="frontSide"
-        :backSide="backSide"
-        :showBackSide="showBackSide"
-        @click="onCardClicked"
-      />
+    <ion-content
+      :scroll-events="false"
+      :scroll-y="false"
+      :scroll-x="false"
+      style="perspective: 800px;"
+    >
+      <VerseCard
+        v-for="card, idx in cards"
+        :key="card.card.id"
+        :visible="card.visible"
+        :index="reviewCount - idx"
+        @reviewed="out"
+      >
+        <template v-slot:question>
+          <div v-if="card.card.type === 'text:number'" class="front">
+            <div>Number?</div>
+            <div>{{ card.verse?.text }}</div>
+          </div>
+          <div v-if="card.card.type === 'translation:number'" class="front">
+            <div>Number?</div>
+            <div>{{ card.verse?.translation }}</div>
+          </div>
+          <div v-if="card.card.type === 'number:text'" class="front">
+            <div>Text?</div>
+            <div>{{ card.verse?.number }}</div>
+          </div>
+          <div v-if="card.card.type === 'number:translation'" class="front">
+            <div>Translation?</div>
+            <div>{{ card.verse?.number }}</div>
+          </div>
+          <div v-if="card.card.type === 'translation:text'" class="front">
+            <div>Text?</div>
+            <div>{{ card.verse?.translation }}</div>
+          </div>
+          <div v-if="card.card.type === 'text:translation'" class="front">
+            <div>Translation?</div>
+            <div>{{ card.verse?.text }}</div>
+          </div>
+        </template>
 
+        <template v-slot:answer>
+          <div v-if="card.card.type === 'text:number'" class="back">
+            <div>{{ card.verse?.number }}</div>
+          </div>
+          <div v-if="card.card.type === 'translation:number'" class="back">
+            <div>{{ card.verse?.number }}</div>
+          </div>
+          <div v-if="card.card.type === 'number:text'" class="back">
+            <div>{{ card.verse?.text }}</div>
+          </div>
+          <div v-if="card.card.type === 'number:translation'" class="back">
+            <div>{{ card.verse?.translation }}</div>
+          </div>
+          <div v-if="card.card.type === 'translation:text'" class="back">
+            <div>{{ card.verse?.text }}</div>
+          </div>
+          <div v-if="card.card.type === 'text:translation'" class="back">
+            <div>{{ card.verse?.translation }}</div>
+          </div>
+        </template>
+      </VerseCard>
     </ion-content>
   </ion-page>
 </template>
 
+
 <script lang="ts" setup>
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/vue';
-import VerseQAView from '@/components/VerseQAView.vue'
-import { ref } from 'vue'
-import { useReviewStore } from '@/stores/review';
-import { verses } from '@/lib/verses';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonBadge, IonProgressBar, IonContent } from '@ionic/vue';
+import VerseCard from '@/components/cards/VerseCard.vue';
+import { ref, computed } from 'vue'
+import { ReviewCard, useReviewStore } from '@/stores/review';
+import { Verse, verses } from '@/lib/verses';
 
 const reviewStore = useReviewStore()
 
-
-function nextCard () {
-  const card = reviewStore.readyForReview[0]
-  const tokens = card.type.split(":")
-  const verse = verses.find(x => x.number === card.verseId)
-
-  question.value = "waht is a " + tokens[1] + "?"
-  frontSide.value = verse[tokens[0]]
-  backSide.value = verse[tokens[1]]
+interface ReviewCardViewModel {
+  card: ReviewCard
+  visible: boolean
+  verse: Verse | undefined
 }
 
-const question = ref<string>("Question")
-const frontSide = ref<string>("Answer")
-const backSide = ref<string>("Answer")
-const showBackSide = ref<boolean>(false)
 
-function onCardClicked() {
-  if (!showBackSide.value) {
-    showBackSide.value = true
-  } else {
-    reviewStore.markReviewed()
-    nextCard()
-    showBackSide.value = false
+const progress = computed(() => 1 - cards.value.length / reviewCount)
+
+const cards = ref<ReviewCardViewModel[]>([])
+reviewStore.readyForReview.forEach((card: ReviewCard) => {
+  cards.value.push({
+    card: card,
+    verse: verses.find(v => v.number === card.verseId),
+    visible: false
+  })
+})
+cards.value[0].visible = true
+
+const reviewCount = cards.value.length
+function out() {
+  setTimeout(() => cards.value.splice(0, 1), 500)
+  if (cards.value.length > 1) {
+    cards.value[1].visible = true
   }
 }
 </script>
+
+<style scoped>
+.front {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  font-size: 6vw;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.back {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  font-size: 6vw;
+}
+</style>

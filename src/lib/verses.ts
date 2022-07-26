@@ -1,4 +1,10 @@
-export const verses = [
+export interface Verse {
+    number: string
+    text: string
+    translation: string
+}
+
+export const verses: Verse[] = [
     {
         number: 'BG 1.1',
         text: `
