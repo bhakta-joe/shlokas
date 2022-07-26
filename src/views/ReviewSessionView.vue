@@ -16,7 +16,7 @@
       style="perspective: 800px;"
     >
       <VerseCard
-        v-for="card, idx in cards"
+        v-for="card, idx in cards.slice(0,2)"
         :key="card.card.id"
         :visible="card.visible"
         :index="reviewCount - idx"
@@ -104,6 +104,7 @@ reviewStore.readyForReview.forEach((card: ReviewCard) => {
 cards.value[0].visible = true
 
 const reviewCount = cards.value.length
+
 function out() {
   setTimeout(() => cards.value.splice(0, 1), 500)
   if (cards.value.length > 1) {
