@@ -13,22 +13,22 @@
       :scroll-events="false"
       :scroll-y="false"
       :scroll-x="false"
-      color="medium"
+      color="light"
     >
-      <VerseCard
-        v-for="card, idx in cards"
-        :key="card.id"
-        :visible="card.visible"
-        :index="reviewCount-idx"
-        @reviewed="out"
-      >
-        <template v-slot:question>
-          QUESTION Card #{{ card.id }} {{ card.visible }}
-        </template>
-        <template v-slot:answer>
-          ANSWER Card #{{ card.id }} {{ card.visible }}
-        </template>
-      </VerseCard>
+        <VerseCard
+          v-for="card, idx in cards"
+          :key="card.id"
+          :visible="card.visible"
+          :index="reviewCount-idx"
+          @reviewed="out"
+        >
+          <template v-slot:question>
+            QUESTION Card #{{ card.id }} {{ card.visible }}
+          </template>
+          <template v-slot:answer>
+            ANSWER Card #{{ card.id }} {{ card.visible }}
+          </template>
+        </VerseCard>
     </ion-content>
   </ion-page>
 </template>
@@ -59,3 +59,12 @@ function out() {
   }
 }
 </script>
+
+<style scoped>
+.perspective {
+  perspective: 800px;
+  width: 100%;
+  height: 100%;
+  background-color: antiquewhite;
+}
+</style>
