@@ -1,7 +1,7 @@
 <template>
     <div
         ref="card"
-        :class="classes"
+        class="card"
         @click="showAnswer"
     >
         <div class="card__face card__face--front">
@@ -25,24 +25,40 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['reviewed'])
-const classes = ref({
-    card: true,
-    invisible: true,
-    in: false, out: false, open: false
-})
 const card = ref()
 
-watch(() => props.visible, (value) => {
-    if (value) { classes.value.in = true }
-    classes.value.invisible = !value
-},{ immediate:true })
+
 
 function showAnswer() {
-    classes.value.open = true // !classes.value.open
-    classes.value.in = false // !classes.value.open
+    setTransform(0,0,.5,1)
 }
 
+function setTransform(x: number, y: number, angle: number, scale: number) {
+    if (card.value) {
+        card.value.style.transform = `translate(${x}px, ${y}px) rotateY(${angle}turn) scale(${scale})`
+        console.log(card.value.style.transform);
+    }
+}
+function setOpacity(x: number) {
+    if (card.value) {
+        card.value.style.opacity = `${x}`
+        console.log(card.value.style.opacity);
+    }
+}
+
+
 onMounted(() => {
+    watch(() => props.visible, (value) => {
+        console.log("!!!", value)
+        if (value) {
+            setOpacity(1)
+            setTransform(0, 0, 0, 1)
+        } else {
+            setOpacity(0)
+            setTransform(0, 0, 0, .8)
+        }
+    },{ immediate:true })
+
     interact(card.value as Target).draggable({
         listeners: {
             move(event) {
@@ -51,21 +67,21 @@ onMounted(() => {
                 var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
                 var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
 
-                // translate the element
-                // target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
-                target.style.left = x + 'px'
-                target.style.top = y + 'px'
+                target.style.transitionDuration = "0s"
+                setTransform(x, y, .5, 1)
 
                 // update the posiion attributes
                 target.setAttribute('data-x', x)
                 target.setAttribute('data-y', y)
             },
-            end() {
-                // var target = event.target
-                // target.style.opacity = 0
-                // classes.value.in = false
-                classes.value.open = false
-                classes.value.out = true
+            end(event) {
+                var target = event.target
+                target.style.transitionDuration = "500ms"
+                // setOpacity(0)
+                var x = (parseFloat(target.getAttribute('data-x')) || 0)
+                var y = (parseFloat(target.getAttribute('data-y')) || 0)
+
+                setTransform(x*5, y*5, .5, 1)
                 emit('reviewed')
             }
         }
@@ -74,30 +90,25 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.invisible {
-    opacity: 0;
-}
-
 .card {
+    color: black;
     width: 96%;
     height: 97%;
     padding: 5px;
     position: absolute;
-    background-color: rgb(113, 196, 255);
-    border: 1px solid gray;
-    border-radius: 0.75em;
+    background-color: white;
+    box-shadow: 0 5px 0px 0px #555;
+    border-radius: 0.3em;
+    border: 1px solid #ddd;
+    transition: all;
+    transition-duration: 500ms;
+
     padding: 4%;
     margin: 2%;
     touch-action: none;
     user-select: none;
     z-index: v-bind("props.index");
     transform-style: preserve-3d;
-
-    &.open {
-        animation-duration: 0.5s;
-        animation-name: animate-open;
-        animation-fill-mode: forwards;
-    }
 
     .card__face {
       position: absolute;
@@ -113,41 +124,5 @@ onMounted(() => {
         transform: rotateY(0.5turn);
       }
     }
-}
-
-.in {
-    animation-duration: 0.5s;
-    animation-name: animate-in;
-    animation-fill-mode: forwards;
-}
-
-
-@keyframes animate-in {
-    0% {
-        opacity: 0;
-        transform: translate(0px, 0px) scale(.8);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translate(0px, 0px) scale(1);
-    }
-}
-
-@keyframes animate-open {
-    0% { transform: rotateY(0turn); }
-    100% { transform: rotateY(0.5turn); }
-}
-
-.out {
-    animation-duration: 0.5s;
-    animation-name: animate-out;
-    animation-fill-mode: forwards;
-    transform: rotateY(0.5turn);
-}
-
-@keyframes animate-out {
-    // 0% { opacity: 1; background: red }
-    100% { opacity: 0; }
 }
 </style>

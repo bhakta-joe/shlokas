@@ -13,63 +13,64 @@
       :scroll-events="false"
       :scroll-y="false"
       :scroll-x="false"
-      style="perspective: 800px;"
     >
-      <VerseCard
-        v-for="card, idx in cards.slice(0,2)"
-        :key="card.card.id"
-        :visible="card.visible"
-        :index="reviewCount - idx"
-        @reviewed="out"
-      >
-        <template v-slot:question>
-          <div v-if="card.card.type === 'text:number'" class="front">
-            <div>Number?</div>
-            <div>{{ card.verse?.text }}</div>
-          </div>
-          <div v-if="card.card.type === 'translation:number'" class="front">
-            <div>Number?</div>
-            <div>{{ card.verse?.translation }}</div>
-          </div>
-          <div v-if="card.card.type === 'number:text'" class="front">
-            <div>Text?</div>
-            <div>{{ card.verse?.number }}</div>
-          </div>
-          <div v-if="card.card.type === 'number:translation'" class="front">
-            <div>Translation?</div>
-            <div>{{ card.verse?.number }}</div>
-          </div>
-          <div v-if="card.card.type === 'translation:text'" class="front">
-            <div>Text?</div>
-            <div>{{ card.verse?.translation }}</div>
-          </div>
-          <div v-if="card.card.type === 'text:translation'" class="front">
-            <div>Translation?</div>
-            <div>{{ card.verse?.text }}</div>
-          </div>
-        </template>
+      <div class="perspective">
+        <VerseCard
+          v-for="card, idx in cards.slice(0,2)"
+          :key="card.card.id"
+          :visible="card.visible"
+          :index="reviewCount - idx"
+          @reviewed="out"
+        >
+          <template v-slot:question>
+            <div v-if="card.card.type === 'text:number'" class="front">
+              <div>Number?</div>
+              <div>{{ card.verse?.text }}</div>
+            </div>
+            <div v-if="card.card.type === 'translation:number'" class="front">
+              <div>Number?</div>
+              <div>{{ card.verse?.translation }}</div>
+            </div>
+            <div v-if="card.card.type === 'number:text'" class="front">
+              <div>Text?</div>
+              <div>{{ card.verse?.number }}</div>
+            </div>
+            <div v-if="card.card.type === 'number:translation'" class="front">
+              <div>Translation?</div>
+              <div>{{ card.verse?.number }}</div>
+            </div>
+            <div v-if="card.card.type === 'translation:text'" class="front">
+              <div>Text?</div>
+              <div>{{ card.verse?.translation }}</div>
+            </div>
+            <div v-if="card.card.type === 'text:translation'" class="front">
+              <div>Translation?</div>
+              <div>{{ card.verse?.text }}</div>
+            </div>
+          </template>
 
-        <template v-slot:answer>
-          <div v-if="card.card.type === 'text:number'" class="back">
-            <div>{{ card.verse?.number }}</div>
-          </div>
-          <div v-if="card.card.type === 'translation:number'" class="back">
-            <div>{{ card.verse?.number }}</div>
-          </div>
-          <div v-if="card.card.type === 'number:text'" class="back">
-            <div>{{ card.verse?.text }}</div>
-          </div>
-          <div v-if="card.card.type === 'number:translation'" class="back">
-            <div>{{ card.verse?.translation }}</div>
-          </div>
-          <div v-if="card.card.type === 'translation:text'" class="back">
-            <div>{{ card.verse?.text }}</div>
-          </div>
-          <div v-if="card.card.type === 'text:translation'" class="back">
-            <div>{{ card.verse?.translation }}</div>
-          </div>
-        </template>
-      </VerseCard>
+          <template v-slot:answer>
+            <div v-if="card.card.type === 'text:number'" class="back">
+              <div>{{ card.verse?.number }}</div>
+            </div>
+            <div v-if="card.card.type === 'translation:number'" class="back">
+              <div>{{ card.verse?.number }}</div>
+            </div>
+            <div v-if="card.card.type === 'number:text'" class="back">
+              <div>{{ card.verse?.text }}</div>
+            </div>
+            <div v-if="card.card.type === 'number:translation'" class="back">
+              <div>{{ card.verse?.translation }}</div>
+            </div>
+            <div v-if="card.card.type === 'translation:text'" class="back">
+              <div>{{ card.verse?.text }}</div>
+            </div>
+            <div v-if="card.card.type === 'text:translation'" class="back">
+              <div>{{ card.verse?.translation }}</div>
+            </div>
+          </template>
+        </VerseCard>
+      </div>
     </ion-content>
   </ion-page>
 </template>
@@ -114,6 +115,13 @@ function out() {
 </script>
 
 <style scoped>
+.perspective {
+  perspective: 800px;
+  width: 100%;
+  height: 100%;
+  background-color: antiquewhite;
+}
+
 .front {
   display: flex;
   flex-direction: column;

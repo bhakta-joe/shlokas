@@ -13,6 +13,7 @@
       :scroll-events="false"
       :scroll-y="false"
       :scroll-x="false"
+      color="medium"
     >
       <VerseCard
         v-for="card, idx in cards"
@@ -21,7 +22,12 @@
         :index="reviewCount-idx"
         @reviewed="out"
       >
-        Card #{{ card.id }} {{ card.visible }}
+        <template v-slot:question>
+          QUESTION Card #{{ card.id }} {{ card.visible }}
+        </template>
+        <template v-slot:answer>
+          ANSWER Card #{{ card.id }} {{ card.visible }}
+        </template>
       </VerseCard>
     </ion-content>
   </ion-page>
