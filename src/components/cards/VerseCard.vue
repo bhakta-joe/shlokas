@@ -1,6 +1,7 @@
 <template>
     <div ref="card" class="card" :class="{
-        'open': isCardOpen
+        'open': isCardOpen,
+        'invisible': !isVisible,
     }" @click="showAnswer">
         <div class="card__face card__face--front">
             <slot name="question"></slot>
@@ -23,65 +24,53 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['reviewed'])
+
 const card = ref()
 const isCardOpen = ref<boolean>(false)
+const isVisible = ref<boolean>(false)
+const scale = ref<number>(.8)
+const x = ref<number>(0)
+const y = ref<number>(0)
+
+
+function showCard() {
+    isVisible.value = true
+    scale.value = 1
+}
 
 function showAnswer() {
-    setTransform(0, 0, 0, 1)
     isCardOpen.value = true
 }
 
-function setTransform(x: number, y: number, angle: number, scale: number) {
-    if (card.value) {
-        card.value.style.transform = `translate(${x}px, ${y}px) scale(${scale})`
-        // console.log(card.value.style.transform);
-    }
-}
-function setOpacity(x: number) {
-    if (card.value) {
-        card.value.style.opacity = `${x}`
-        // console.log(card.value.style.opacity);
-    }
+function setTransform(x: number, y: number) {
+    card.value.style.transform = `translate(${x}px, ${y}px)`
 }
 
 
 onMounted(() => {
-    watch(() => props.visible, (value) => {
-        // console.log("!!!", value)
-        if (value) {
-            setOpacity(1)
-            setTransform(0, 0, 0, 1)
-        } else {
-            setOpacity(0)
-            setTransform(0, 0, 0, .8)
-        }
+    watch(() => props.visible, (value: boolean) => {
+        if (value) { showCard() }
     }, { immediate: true })
 
     interact(card.value as Target).draggable({
         listeners: {
             move(event) {
-                // console.log(event)
-                var target = event.target
-                // keep the dragged position in the data-x/data-y attributes
-                var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
-                var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
-
-                target.style.transition = "none"
-                setTransform(x, y, .5, 1)
-
-                // update the posiion attributes
-                target.setAttribute('data-x', x)
-                target.setAttribute('data-y', y)
+                event.target.style.transition = "none"
+                x.value += event.dx
+                y.value += event.dy
+                setTransform(x.value, y.value)
             },
             end(event) {
-                var target = event.target
-                target.style.transition = "500ms linear"
-                // setOpacity(0)
-                var x = (parseFloat(target.getAttribute('data-x')) || 0)
-                var y = (parseFloat(target.getAttribute('data-y')) || 0)
-
-                setTransform(x * 5, y * 5, .5, 1)
-                emit('reviewed')
+                const movedLong = Math.abs(x.value) > 20 || Math.abs(x.value) > 20
+                if (movedLong) {
+                    event.target.style.transition = ".5s ease-in-out"
+                    isVisible.value = false
+                    emit('reviewed')
+                } else {
+                    x.value = 0
+                    y.value = 0
+                    setTransform(x.value, y.value)
+                }
             }
         }
     })
@@ -89,24 +78,32 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+.invisible {
+    opacity: 0;
+    transform: scale(.8);
+}
 .card {
     color: black;
-    width: 96%;
-    height: 97%;
-    padding: 4%;
-    perspective: 800px;
-    margin: 2%;
-    // position: relative;
-    transition: 1s ease-in-out;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+
+    margin: 10px;
+
+    perspective: 1800px;
+    position: absolute;
+    transition: .5s ease-in-out;
     touch-action: none;
     user-select: none;
+    z-index: v-bind("props.index");
+    // left: v-bind("x");
+    // top: v-bind("y");
 
     .card__face {
-        padding: 4%;
-        text-align: center;
         background-color: white;
+        padding: 20px;
+        text-align: center;
         box-shadow: 0 5px 0px 0px #555;
-        border-radius: 0.3em;
+        border-radius: 0.4em;
         border: 1px solid #ddd;
         position: absolute;
         top: 0;
