@@ -44,17 +44,31 @@ function showAnswer() {
     isCardOpen.value = true
 }
 
-const transform = computed(() =>
-    `translate(${x.value}px, ${y.value}px)
-    rotate(${rotation.value}deg)
-    scale(${scale.value})`
+const transform = computed(() => `translate(${x.value}px, ${y.value}px) rotate(${rotation.value}deg) scale(${scale.value})`
 )
+// x.value = 1
+// watch(() => transform.value, () => {
+//     console.log(transform.value)
+//     if (card.value) {
+//     // card.value.style.transform = transform.value
+//     }
+// })
+
+// if (props.visible) { showCard() }
 
 
 onMounted(() => {
+
     watch(() => props.visible, (value: boolean) => {
-        if (value) { showCard() }
-    }, { immediate: true })
+        // console.log(value)
+        if (value) {
+            // console.log("!!!", card.value.style.transform)
+            // card.value.style.transform = 'translate(0px, 0px) rotate(0deg) scale(.8)'
+            // console.log("!!!", card.value.style.transform)
+            // showCard()
+            setTimeout(() => showCard(), 10)
+        }
+    }, {immediate:true})
 
     interact(card.value as Target).draggable({
         listeners: {
@@ -94,7 +108,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
-$ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 .card {
     color: black;
     width: calc(100% - 20px);
@@ -105,12 +118,13 @@ $ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
     perspective: 1800px;
     position: absolute;
     transition: .5s ease-in-out;
-    // transition: 0.7s $ease-out-back;
     touch-action: none;
     user-select: none;
     z-index: v-bind("props.index");
     transform: v-bind(transform);
     opacity: v-bind(opacity);
+
+    will-change: transform;
 
     .card__face {
         background-color: white;
