@@ -117,7 +117,7 @@ onBeforeUnmount(() => {
 
     perspective: 1800px;
     position: absolute;
-    transition: .5s ease-in-out;
+    transition: .5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
     touch-action: none;
     user-select: none;
     z-index: v-bind("props.index");
@@ -127,11 +127,11 @@ onBeforeUnmount(() => {
     will-change: transform;
 
     .card__face {
+        outline: 1px solid transparent;
         background-color: white;
         padding: 20px;
         text-align: center;
-        box-shadow: 0 5px 0px 0px #555;
-        border-radius: 0.4em;
+        border-radius: 8px;
         border: 1px solid #ddd;
         position: absolute;
         top: 0;
@@ -140,6 +140,10 @@ onBeforeUnmount(() => {
         height: 100%;
         backface-visibility: hidden;
         transition: .5s ease-in-out;
+
+        &--front {
+            border-bottom: 10px solid #ddd;
+        }
 
         &--back {
             transform: rotateY(0.5turn);
