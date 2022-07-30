@@ -1,7 +1,6 @@
 <template>
     <div ref="card" class="card" :class="{
         'open': isCardOpen,
-        'invisible': !isVisible,
     }" @click="showAnswer">
         <div class="card__face card__face--front">
             <slot name="question"></slot>
@@ -15,26 +14,29 @@
 
 <script lang="ts" setup>
 import interact from "interactjs";
-import { onMounted, ref, defineProps, watch, defineEmits } from 'vue'
+import { onMounted, ref, defineProps, watch, defineEmits, computed, onBeforeUnmount } from 'vue'
 import { Target } from '@interactjs/types';
 
 const props = defineProps<{
     visible: boolean,
     index: number,
+    answerThreshold: number,
 }>()
 
-const emit = defineEmits(['reviewed'])
+const emit = defineEmits(['reviewed', 'rating'])
 
 const card = ref()
 const isCardOpen = ref<boolean>(false)
-const isVisible = ref<boolean>(false)
-const scale = ref<number>(.8)
+
 const x = ref<number>(0)
 const y = ref<number>(0)
+const rotation = ref<number>(0)
+const opacity = ref<number>(0)
+const scale = ref<number>(.8)
 
 
 function showCard() {
-    isVisible.value = true
+    opacity.value = 1
     scale.value = 1
 }
 
@@ -42,9 +44,11 @@ function showAnswer() {
     isCardOpen.value = true
 }
 
-function setTransform(x: number, y: number) {
-    card.value.style.transform = `translate(${x}px, ${y}px)`
-}
+const transform = computed(() =>
+    `translate(${x.value}px, ${y.value}px)
+    rotate(${rotation.value}deg)
+    scale(${scale.value})`
+)
 
 
 onMounted(() => {
@@ -54,34 +58,43 @@ onMounted(() => {
 
     interact(card.value as Target).draggable({
         listeners: {
-            move(event) {
+            start(event) {
                 event.target.style.transition = "none"
+            },
+            move(event) {
                 x.value += event.dx
                 y.value += event.dy
-                setTransform(x.value, y.value)
+                rotation.value = 15 * (x.value / 200);
+                if (rotation.value >  15) { rotation.value =  15 }
+                if (rotation.value < -15) { rotation.value = -15 }
+
+                if (Math.abs(x.value) > props.answerThreshold) {
+                    emit('rating', x.value > 0 ? x.value - props.answerThreshold : x.value + props.answerThreshold)
+                }
             },
             end(event) {
-                const movedLong = Math.abs(x.value) > 20 || Math.abs(x.value) > 20
+                event.target.style.transition = ".5s ease-in-out"
+                const movedLong = Math.abs(x.value) >= props.answerThreshold
                 if (movedLong) {
-                    event.target.style.transition = ".5s ease-in-out"
-                    isVisible.value = false
+                    opacity.value = 0
                     emit('reviewed')
                 } else {
                     x.value = 0
                     y.value = 0
-                    setTransform(x.value, y.value)
+                    rotation.value = 0
                 }
             }
         }
     })
 })
+
+onBeforeUnmount(() => {
+    interact(card.value as Target).unset()
+})
 </script>
 
 <style scoped lang="scss">
-.invisible {
-    opacity: 0;
-    transform: scale(.8);
-}
+$ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 .card {
     color: black;
     width: calc(100% - 20px);
@@ -92,11 +105,12 @@ onMounted(() => {
     perspective: 1800px;
     position: absolute;
     transition: .5s ease-in-out;
+    // transition: 0.7s $ease-out-back;
     touch-action: none;
     user-select: none;
     z-index: v-bind("props.index");
-    // left: v-bind("x");
-    // top: v-bind("y");
+    transform: v-bind(transform);
+    opacity: v-bind(opacity);
 
     .card__face {
         background-color: white;
