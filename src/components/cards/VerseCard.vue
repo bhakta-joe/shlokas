@@ -20,10 +20,10 @@ import { Target } from '@interactjs/types';
 const props = defineProps<{
     visible: boolean,
     index: number,
-    answerThreshold: number,
+    markThreshold: number,
 }>()
 
-const emit = defineEmits(['reviewed', 'rating'])
+const emit = defineEmits(['marked', 'marking'])
 
 const card = ref()
 const isCardOpen = ref<boolean>(false)
@@ -33,6 +33,11 @@ const y = ref<number>(0)
 const rotation = ref<number>(0)
 const opacity = ref<number>(0)
 const scale = ref<number>(.8)
+const mark = computed<number>(function() {
+    if (x.value >  props.markThreshold) { return x.value - props.markThreshold }
+    if (x.value < -props.markThreshold) { return x.value + props.markThreshold }
+    return 0;
+})
 
 
 function showCard() {
@@ -46,16 +51,6 @@ function showAnswer() {
 
 const transform = computed(() => `translate(${x.value}px, ${y.value}px) rotate(${rotation.value}deg) scale(${scale.value})`
 )
-// x.value = 1
-// watch(() => transform.value, () => {
-//     console.log(transform.value)
-//     if (card.value) {
-//     // card.value.style.transform = transform.value
-//     }
-// })
-
-// if (props.visible) { showCard() }
-
 
 onMounted(() => {
 
@@ -82,16 +77,13 @@ onMounted(() => {
                 if (rotation.value >  15) { rotation.value =  15 }
                 if (rotation.value < -15) { rotation.value = -15 }
 
-                if (Math.abs(x.value) > props.answerThreshold) {
-                    emit('rating', x.value > 0 ? x.value - props.answerThreshold : x.value + props.answerThreshold)
-                }
+                emit('marking', mark.value)
             },
             end(event) {
                 event.target.style.transition = "0.5s ease-in-out"
-                const movedLong = Math.abs(x.value) >= props.answerThreshold
-                if (movedLong) {
+                if (mark.value != 0) {
                     opacity.value = 0
-                    emit('reviewed')
+                    emit('marking', mark.value)
                 } else {
                     x.value = 0
                     y.value = 0

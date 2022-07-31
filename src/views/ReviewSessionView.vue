@@ -1,17 +1,26 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
-        <ion-title>
-          <ion-badge>{{ cards.length }}</ion-badge>&nbsp;
-        </ion-title>
         <ion-progress-bar :value="progress" />
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :scroll-events="false" :scroll-y="false" :scroll-x="false" color="light">
-      <VerseCard v-for="card, idx in cards.slice(0, 2)" :key="card.card.id" :visible="card.visible"
-        :index="reviewCount - idx" :answer-threshold="50" @reviewed="out" @rating="rating">
+    <ion-content
+      :scroll-events="false"
+      :scroll-y="false"
+      :scroll-x="false"
+      color="light"
+    >
+      <VerseCard
+        v-for="card, idx in cards.slice(0, 2)"
+        :key="card.card.id"
+        :visible="card.visible"
+        :index="reviewCount - idx"
+        :mark-threshold="settings.minSlideToMarkCard"
+        @marked="marked"
+        @marking="marking"
+      >
         <template v-slot:question>
           <div v-if="card.card.type === 'text:number'" class="front">
             <div class="q">Number</div>
@@ -69,10 +78,13 @@
 
 
 <script lang="ts" setup>
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonBadge, IonProgressBar, IonContent } from '@ionic/vue';
+import { IonPage, IonHeader, IonToolbar, IonProgressBar, IonContent } from '@ionic/vue';
+
 import VerseCard from '@/components/cards/VerseCard.vue';
 import VerseLines from '@/components/VerseLines.vue';
+
 import { ref, computed } from 'vue'
+import { settings } from '@/lib/settings'
 import { ReviewCard, useReviewStore } from '@/stores/review';
 import { Verse, verses } from '@/lib/verses';
 
@@ -87,8 +99,8 @@ interface ReviewCardViewModel {
 
 const progress = computed(() => 1 - cards.value.length / reviewCount)
 const currentCardMark = ref<number>(0)
-const markColor = computed(() => currentCardMark.value < 0 ? "red" : "lightgreen")
-const showMarkLabel = computed(() => Math.abs(currentCardMark.value) >= 10 ? .7 : 0)
+const markColor = computed(() => currentCardMark.value < 0 ? "#ffe2e2" : "#e2ffe9")
+const showMarkLabel = ref<number>(0)
 
 const cards = ref<ReviewCardViewModel[]>([])
 reviewStore.readyForReview.forEach((card: ReviewCard) => {
@@ -102,22 +114,27 @@ cards.value[0].visible = true
 
 const reviewCount = cards.value.length
 
-function out() {
+function marked(value: number) {
   setTimeout(() => cards.value.splice(0, 1), 500)
   if (cards.value.length > 1) {
     cards.value[1].visible = true
-    currentCardMark.value = 0
+    showMarkLabel.value=0
   }
 }
 
-function rating(value: number) {
+function marking(value: number) {
   currentCardMark.value = value
+  if (Math.abs(value) > 0) {
+    showMarkLabel.value = .8
+  } else {
+    showMarkLabel.value = 0
+  }
 }
 
 function toHumanMark(value: number): string {
-  if (value < -100) { return "👎 👎" }
-  if (value < -50) { return "👎" }
-  if (value > 100) { return "👍 👍" }
+  if (value < -50) { return "🤯" }
+  if (value < 0) { return "👎" }
+  if (value > 100) { return "🧠 💪" }
   if (value > 50) { return "👍" }
   return "👌"
 }
@@ -155,13 +172,10 @@ function toHumanMark(value: number): string {
 
 .mark {
   position: absolute;
-  /* opacity: 75%; */
-  bottom: 0%;
+  bottom: 75%;
   left: 50%;
-  background-color: lightblue;
-  /* v-bind("markColor"); */
-  padding: 10px;
-  margin: 10px;
+  background-color: v-bind(markColor);
+  padding: 10px 25px 10px 25px;
   border-radius: 5px;
   z-index: 99999;
   transform: translate(-50%, -50%);
