@@ -87,7 +87,7 @@ onMounted(() => {
                 }
             },
             end(event) {
-                event.target.style.transition = ".5s ease-in-out"
+                event.target.style.transition = "0.5s ease-in-out"
                 const movedLong = Math.abs(x.value) >= props.answerThreshold
                 if (movedLong) {
                     opacity.value = 0

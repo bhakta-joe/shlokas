@@ -63,7 +63,7 @@ const cards = ref<ReviewCardViewModel[]>([
 const reviewCount = cards.value.length
 
 function out() {
-  setTimeout(() => cards.value.splice(0, 1), 500)
+  setTimeout(() => cards.value.splice(0, 1), 1500)
   if (cards.value.length > 1) {
     cards.value[1].visible = true
     currentCardMark.value = 0
