@@ -83,7 +83,7 @@ onMounted(() => {
                 event.target.style.transition = "0.5s ease-in-out"
                 if (mark.value != 0) {
                     opacity.value = 0
-                    emit('marking', mark.value)
+                    emit('marked', mark.value)
                 } else {
                     x.value = 0
                     y.value = 0
