@@ -1,62 +1,84 @@
 <template>
   <ion-page>
+    <!-- Header -->
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="primary">
-          <ion-button color="primary" @click="openModal">
+          <ion-button
+            color="primary"
+            @click="openModal"
+          >
             {{ t('add') }}
           </ion-button>
         </ion-buttons>
-        <ion-title>
-          {{ t('inbox') }}
-        </ion-title>
+        <ion-title>{{ t('inbox') }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :scroll-events="false" :scroll-y="false" :scroll-x="false" color="light">
-      <div v-if="!inboxStore.isEmpty">
-        <VerseCard
-          v-for="card, idx in cards.slice(0,1)"
-          :key="card.id"
-          :visible="true"
-          :index="100-idx"
-          :mark-threshold="settings.minSlideToMarkCard"
-          @marked="marked"
-          @rejected="rejected"
-        >
-          <template v-slot:question>
-            <div v-if="card.type === InboxTypeCard.text" class="front">
-              <div class="q">{{ card.verse?.number }}</div>
-              <verse-lines :text="card.verse?.text || ''" />
+    <!-- Content -->
+    <ion-content
+      :scroll-y="false"
+      :scroll-x="false"
+      color="light"
+    >
+      <VerseCard
+        v-for="card in cards.slice(0, 2)"
+        :key="card.id"
+        :index="card.index"
+        :swipe-threshold="settings.minSlideToMarkCard"
+        @swiped="cardSwiped"
+        @rejected="rejected"
+      >
+        <template #question>
+          <div
+            v-if="card.type === InboxTypeCard.text"
+            class="front"
+          >
+            <div class="q">
+              {{ card.verse?.number }}
             </div>
-            <div v-if="card.type === InboxTypeCard.transaltion" class="front">
-              <div class="q">{{ card.verse?.number }}</div>
-              <div>{{ card.verse?.translation }}</div>
+            <verse-lines :text="card.verse?.text || ''" />
+          </div>
+          <div
+            v-if="card.type === InboxTypeCard.transaltion"
+            class="front"
+          >
+            <div class="q">
+              {{ card.verse?.number }}
             </div>
-          </template>
+            <div>{{ card.verse?.translation }}</div>
+          </div>
+        </template>
 
-          <template v-slot:answer>
-            <div class="back">
+        <template #answer>
+          <div class="back">
             <div
               v-for="word in card.verse?.words"
               :key="word.word"
             >
-              <div class="word">{{ word.word }}</div>
+              <div class="word">
+                {{ word.word }}
+              </div>
               <div>{{ word.translation }}</div>
             </div>
-            </div>
-          </template>
-        </VerseCard>
-      </div>
+          </div>
+        </template>
+      </VerseCard>
 
-      <InboxEmpty v-if="inboxStore.isEmpty" @click="openModal" />
+      <InboxEmpty
+        v-if="inboxStore.isEmpty"
+        @click="openModal"
+      />
     </ion-content>
   </ion-page>
 </template>
 
 
 <script lang="ts" setup>
-import { IonPage, IonHeader, IonToolbar, IonContent, IonTitle, IonButtons, IonButton, modalController } from '@ionic/vue';
+import {
+  IonPage, IonHeader, IonToolbar, IonContent, IonTitle,
+  IonButtons, IonButton, modalController
+} from '@ionic/vue';
 
 import InboxEmpty from '@/components/InboxEmpty.vue';
 import VerseCard from '@/components/cards/VerseCard.vue';
@@ -78,8 +100,8 @@ const { t } = useI18n()
 interface RevieInboxCardViewModel {
   id: string,
   type: InboxTypeCard
-  visible: boolean
-  verse: Verse | undefined
+  verse: Verse | undefined,
+  index: number
 }
 
 
@@ -88,26 +110,24 @@ function updateViewModel() {
   cards.value = inboxStore.readyForReview.map(x => ({
     id: x.id,
     type: x.type,
-    visible: false,
-    verse: verses.find(v => v.number === x.verseId)
+    verse: verses.find(v => v.number === x.verseId),
+    index: 0
   }))
-  cards.value[0].visible = true
+  cards.value[0].index = 0
+  cards.value[1].index = 1
 }
+
 
 // const reviewCount = cards.value.length
 
-function marked(value: number) {
+function cardSwiped() {
   setTimeout(() => {
-    // cards.value.splice(0, 1)
-    // cards.value[0].visible = false
-    const first = cards.value.shift()
-    if (first) {
-      cards.value.push(first)
-    }
-  }, 500)
-  // if (cards.value.length > 1) {
-  //   cards.value[1].visible = true
-  // }
+    // const first = cards.value.shift()
+    // if (first) { cards.value.push(first) }
+    // cards.value.reverse()
+      cards.value[0].index = 1-cards.value[0].index
+      cards.value[1].index = 1-cards.value[1].index
+  }, 250)
 }
 
 function rejected() {
@@ -165,8 +185,6 @@ async function openModal() {
   align-items: center;
   justify-content: center;
   font-size: 6vw;
-  /* text-align: justify; */
-  /* text-justify: inter-word; */
 }
 
 .back {

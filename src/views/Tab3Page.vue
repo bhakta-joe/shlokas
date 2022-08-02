@@ -20,7 +20,7 @@
           :key="card.id"
           :visible="card.visible"
           :index="reviewCount-idx"
-          :markThreshold="answer_threshold"
+          :swipeThreshold="answer_threshold"
           @reviewed="out"
           @rating="rating"
         >

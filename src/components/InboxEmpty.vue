@@ -40,6 +40,6 @@ tap-to-add: Tap to add new verses to your inbox.
 </i18n>
 
 <i18n locale="ru" lang="yaml">
-empty: Входящие пусты.
+empty: Ты полон пустоты.
 tap-to-add: Жмакни чтобы добавить.
 </i18n>
