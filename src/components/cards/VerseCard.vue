@@ -23,7 +23,7 @@ const props = defineProps<{
     markThreshold: number,
 }>()
 
-const emit = defineEmits(['marked', 'marking'])
+const emit = defineEmits(['marked', 'marking', 'rejected'])
 
 const card = ref()
 const isCardOpen = ref<boolean>(false)
@@ -32,7 +32,7 @@ const x = ref<number>(0)
 const y = ref<number>(0)
 const rotation = ref<number>(0)
 const opacity = ref<number>(0)
-const scale = ref<number>(.8)
+const scale = ref<number>(.6)
 const mark = computed<number>(function() {
     if (x.value >  props.markThreshold) { return x.value - props.markThreshold }
     if (x.value < -props.markThreshold) { return x.value + props.markThreshold }
@@ -45,8 +45,16 @@ function showCard() {
     scale.value = 1
 }
 
+function hideCard() {
+    // x.value = 0
+    // y.value = 0
+    // scale.value = .8
+    // rotation.value = 0
+    // isCardOpen.value = false
+}
+
 function showAnswer() {
-    isCardOpen.value = true
+    isCardOpen.value = !isCardOpen.value
 }
 
 const transform = computed(() => `translate(${x.value}px, ${y.value}px) rotate(${rotation.value}deg) scale(${scale.value})`
@@ -55,13 +63,15 @@ const transform = computed(() => `translate(${x.value}px, ${y.value}px) rotate($
 onMounted(() => {
 
     watch(() => props.visible, (value: boolean) => {
-        // console.log(value)
+        console.log("watch", value)
         if (value) {
             // console.log("!!!", card.value.style.transform)
             // card.value.style.transform = 'translate(0px, 0px) rotate(0deg) scale(.8)'
             // console.log("!!!", card.value.style.transform)
             // showCard()
             setTimeout(() => showCard(), 10)
+        } else {
+            setTimeout(() => hideCard(), 10)
         }
     }, {immediate:true})
 
@@ -81,8 +91,20 @@ onMounted(() => {
             },
             end(event) {
                 event.target.style.transition = "0.5s ease-in-out"
+                if (Math.abs(y.value) > 100) {
+                    y.value *= 8
+                    interact(card.value as Target).unset()
+                    emit('rejected')
+                    return
+                }
+
+
                 if (mark.value != 0) {
-                    opacity.value = 0
+                    rotation.value *= 2
+                    x.value *= 8
+                    // opacity.value = 0
+                    // hideCard()
+                    interact(card.value as Target).unset()
                     emit('marked', mark.value)
                 } else {
                     x.value = 0
@@ -134,11 +156,12 @@ onBeforeUnmount(() => {
         transition: .5s ease-in-out;
 
         &--front {
-            border-bottom: 10px solid #ddd;
+            border-left: 10px solid #ddd;
         }
 
         &--back {
             transform: rotateY(0.5turn);
+            border-right: 10px solid #ddd;
         }
     }
 }

@@ -13,7 +13,7 @@
       color="light"
     >
       <VerseCard
-        v-for="card, idx in cards.slice(0, 2)"
+        v-for="card, idx in cards.slice(0, 1)"
         :key="card.card.id"
         :visible="card.visible"
         :index="reviewCount - idx"

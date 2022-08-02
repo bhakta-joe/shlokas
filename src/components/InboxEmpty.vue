@@ -1,6 +1,6 @@
 <template>
     <div class="root">
-        <ion-img src="inbox-empty.png" class="img" />
+        <ion-img src="brahma.svg" class="img" />
         <div class="text">
             <div>Your inbox is empty.</div>
             <div>Tap to <b>add new verses</b> to your inbox.</div>
@@ -18,9 +18,12 @@ import { IonImg } from '@ionic/vue';
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    height: 100%;
 }
 .text {
     margin: 20px;
+    text-align: center;
 }
 .img {
     max-width: 50%;

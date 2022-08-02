@@ -1,7 +1,13 @@
+interface Word {
+    word: string
+    translation: string
+}
+
 export interface Verse {
     number: string
     text: string
     translation: string
+    words?: Word[]
 }
 
 export const verses: Verse[] = [
@@ -14,7 +20,12 @@ export const verses: Verse[] = [
         māmakāḥ pāṇḍavāś caiva
         kim akurvata sañjaya
         `,
-        translation: "Dhṛtarāṣṭra said: O Sañjaya, after my sons and the sons of Pāṇḍu assembled in the place of pilgrimage at Kurukṣetra, desiring to fight, what did they do?"
+        translation: "Dhṛtarāṣṭra said: O Sañjaya, after my sons and the sons of Pāṇḍu assembled in the place of pilgrimage at Kurukṣetra, desiring to fight, what did they do?",
+        words: [
+            { word: "samavetā", translation: "assembled" },
+            { word: "yuyutsavaḥ", translation: "desiring to fight" },
+            { word: "māmakāḥ", translation: "my party (sons)" },
+        ]
     },
     {
         number: 'BG 2.13',

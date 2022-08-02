@@ -1,9 +1,14 @@
 import { defineStore } from 'pinia'
 
+export enum InboxTypeCard {
+  text,
+  transaltion
+}
+
 export type InboxCard = {
     id: string,
-    title: string
-    content: string,
+    type: InboxTypeCard,
+    verseId: string
 }
 
 export type InboxState = {
@@ -17,10 +22,10 @@ export const useInboxStore = defineStore('inbox', {
     } as InboxState
   },
   actions: {
-    addCard(title: string, content: string) {
+    addCard(type: InboxTypeCard, verseId: string) {
       const r = (Math.random() + 1).toString(36).substring(7);
 
-      this.cards.push({title, content, id: r})
+      this.cards.push({type, verseId, id: r})
     },
     mark(id: string) {
       const idx = this.cards.findIndex(c => c.id === id)
@@ -29,7 +34,7 @@ export const useInboxStore = defineStore('inbox', {
   },
   getters: {
     isAllReviewdByVerse() {
-      return (verse: string) => this.cards.filter(c => c.title === verse).length === 0
+      return (verseId: string) => this.cards.filter(c => c.verseId === verseId).length === 0
     },
     isEmpty(): boolean {
       return this.cards.length === 0
