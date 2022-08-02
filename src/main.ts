@@ -1,5 +1,6 @@
 import { createPinia } from "pinia";
 import { createApp } from 'vue'
+import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router';
 
@@ -24,10 +25,19 @@ import '@ionic/vue/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
+/* Localization */
+const i18n = createI18n({
+  legacy: false,
+  locale: 'en',
+  fallbackLocale: 'en',
+})
+
+/* App */
 const app = createApp(App)
   .use(createPinia())
   .use(IonicVue)
-  .use(router);
+  .use(router)
+  .use(i18n)
 
 router.isReady().then(() => {
   app.mount('#app');
