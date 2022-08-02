@@ -3,9 +3,13 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="primary">
-            <ion-button color="primary" @click="openModal">Add</ion-button>
+          <ion-button color="primary" @click="openModal">
+            {{ t('add') }}
+          </ion-button>
         </ion-buttons>
-        <ion-title>Inbox</ion-title>
+        <ion-title>
+          {{ t('inbox') }}
+        </ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -59,15 +63,17 @@ import VerseCard from '@/components/cards/VerseCard.vue';
 import VerseLines from '@/components/VerseLines.vue';
 import InboxAddVerseDialog from '@/components/InboxAddVerseDialog.vue';
 
-import { ref, computed } from 'vue'
+import { ref, } from 'vue'
 import { settings } from '@/lib/settings'
-import { InboxCard, useInboxStore } from '@/stores/inbox';
+import { useInboxStore } from '@/stores/inbox';
 import { useReviewStore } from '@/stores/review';
 import { InboxTypeCard } from '@/stores/inbox'
 import { Verse, verses } from '@/lib/verses';
+import { useI18n } from 'vue-i18n';
 
 const inboxStore = useInboxStore()
 const reviewStore = useReviewStore()
+const { t } = useI18n()
 
 interface RevieInboxCardViewModel {
   id: string,
@@ -194,3 +200,15 @@ async function openModal() {
   font-weight: bold;
 }
 </style>
+
+
+<i18n locale="en" lang="yaml">
+add: Add
+inbox: Inbox
+</i18n>
+
+
+<i18n locale="ru" lang="yaml">
+add: Добавить
+inbox: Входящие
+</i18n>

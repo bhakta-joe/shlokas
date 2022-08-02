@@ -28,7 +28,7 @@ import './theme/variables.css';
 /* Localization */
 const i18n = createI18n({
   legacy: false,
-  locale: 'en',
+  locale: 'ru',
   fallbackLocale: 'en',
 })
 
