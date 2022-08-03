@@ -1,11 +1,14 @@
 <template>
-    <div class="root">
-        <ion-img src="brahma.svg" class="img" />
-        <div class="text">
-            <div>{{ t('empty') }}</div>
-            <div>{{ t('tap-to-add') }}</div>
-        </div>
+  <div class="root">
+    <ion-img
+      src="brahma.svg"
+      class="img"
+    />
+    <div class="text">
+      <div>{{ t('empty') }}</div>
+      <div>{{ t('tap-to-add') }}</div>
     </div>
+  </div>
 </template>
 
 <script lang="ts" setup>

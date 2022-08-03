@@ -30,18 +30,7 @@
         @swiping="(d) => onSwiping(card, d)"
       >
         <template #overlay>
-          <div
-            style="transition: .5s"
-            :class="{ 'invisible': !card.showStudiedOverlay, 'overlay': true }"
-          >
-            😎 Выучил
-          </div>
-          <div
-            style="transition: .5s"
-            :class="{ 'invisible': !card.showStudyingOverlay, 'overlay': true }"
-          >
-            🌀 Ещё учу
-          </div>
+          <InboxCardProgressOverlay :state="card.progress" />
         </template>
 
         <template #question>
@@ -66,17 +55,7 @@
         </template>
 
         <template #answer>
-          <div class="back">
-            <div
-              v-for="word in card.verse?.words"
-              :key="word.word"
-            >
-              <div class="word">
-                {{ word.word }}
-              </div>
-              <div>{{ word.translation }}</div>
-            </div>
-          </div>
+          <WordByWordTranslationSide :words="card.verse?.words || []" />
         </template>
       </VerseCard>
 
@@ -107,6 +86,8 @@ import { useReviewStore } from '@/stores/review';
 import { InboxTypeCard } from '@/stores/inbox'
 import { Verse, verses } from '@/lib/verses';
 import { useI18n } from 'vue-i18n';
+import InboxCardProgressOverlay from '@/components/inbox/cards/InboxCardProgressOverlay.vue';
+import WordByWordTranslationSide from '@/components/inbox/cards/WordByWordTranslationSide.vue';
 
 const inboxStore = useInboxStore()
 const reviewStore = useReviewStore()
@@ -117,8 +98,7 @@ interface RevieInboxCardViewModel {
   type: InboxTypeCard
   verse: Verse | undefined,
   index: number,
-  showStudiedOverlay: boolean,
-  showStudyingOverlay: boolean
+  progress: string
 }
 
 
@@ -131,8 +111,7 @@ function updateViewModel() {
     type: x.type,
     verse: verses.find(v => v.number === x.verseId),
     index: 0,
-    showStudiedOverlay: false,
-    showStudyingOverlay: false
+    progress: ""
   }))
   cards.value[0].index = 0
   cards.value[1].index = 1
@@ -143,20 +122,17 @@ function updateViewModel() {
 
 function onSwiping(card: RevieInboxCardViewModel, { direction, value }) {
   console.log(direction, value)
-  card.showStudiedOverlay = (
-    direction == "top" && value !== 0
-  )
-  card.showStudyingOverlay = (
-    (direction === "left" || direction === "right") && value !== 0
-  )
+
+  card.progress =
+    (direction === "top"  || direction === "bottom") && value !== 0 ? "finished" :
+    (direction === "left" || direction === "right")  && value !== 0 ? "inProgress" : ""
 }
 
 function cardSwiped(card, { direction, value }) {
   setTimeout(() => {
 
     // console.log(card, direction, value)
-    card.showStudiedOverlay = false
-    card.showStudyingOverlay= false
+    card.progress = ""
 
     if (direction == "left" || direction == "right") {
       cards.value[0].index = 1 - cards.value[0].index
@@ -182,7 +158,7 @@ function cardSwiped(card, { direction, value }) {
       }
     }
 
-  }, 500)
+  }, 250)
 }
 
 
@@ -208,18 +184,6 @@ async function openModal() {
   background-color: antiquewhite;
 }
 
-.overlay {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-  font-size: 6vw;
-  background-color: white;
-}
-
 .front {
   display: flex;
   flex-direction: column;
@@ -228,16 +192,13 @@ async function openModal() {
   align-items: center;
   justify-content: center;
   font-size: 6vw;
-}
+  text-align: center;
+  background-color: white;
+  padding: 20px;
 
-.back {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-  font-size: 6vw;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  /* border-bottom: 10px solid #ddd; */
 }
 
 .q {
@@ -255,14 +216,6 @@ async function openModal() {
 
 .number {
   font-size: 12vw;
-}
-
-.word {
-  font-weight: bold;
-}
-
-.invisible {
-  opacity: 0;
 }
 </style>
 

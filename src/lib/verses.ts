@@ -25,6 +25,12 @@ export const verses: Verse[] = [
             { word: "samavetā", translation: "assembled" },
             { word: "yuyutsavaḥ", translation: "desiring to fight" },
             { word: "māmakāḥ", translation: "my party (sons)" },
+            { word: "samavetā", translation: "assembled" },
+            { word: "yuyutsavaḥ", translation: "desiring to fight" },
+            { word: "māmakāḥ", translation: "my party (sons)" },
+            { word: "samavetā", translation: "assembled" },
+            { word: "yuyutsavaḥ", translation: "desiring to fight" },
+            { word: "māmakāḥ", translation: "my party (sons)" },
         ]
     },
     {

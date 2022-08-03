@@ -15,7 +15,7 @@
       <slot name="answer" />
     </div>
 
-    <div class="overlay">
+    <div class="card__face">
       <slot name="overlay" />
     </div>
   </div>
@@ -195,21 +195,25 @@ onBeforeUnmount(() => {
   user-select: none;
   z-index: v-bind(zindex);
   transform: v-bind(transform);
+  // overflow: hidden;
 
   will-change: transform;
 
   .overlay {
-    padding: 20px;
+    // padding: 20px;
     // text-align: center;
-    border-radius: 8px;
-    border: 1px solid #ddd;
+    // border-radius: 8px;
+    // border: 1px solid #ddd;
     position: absolute;
+
     top: 0;
     left: 0;
+    // transform: translate(50%, 50%);
     width: 100%;
     height: 100%;
+
     // backface-visibility: hidden;
-    overflow: hidden;
+    // overflow: hidden;
     // transition: .5s ease-in-out;
     // &--front {
     //   border-left: 10px solid #ddd;
@@ -221,12 +225,11 @@ onBeforeUnmount(() => {
   }
 
   .card__face {
-    outline: 1px solid transparent;
-    background-color: white;
-    padding: 20px;
+    // outline: 1px solid transparent;
+    // background-color: white;
+    // padding: 20px;
     // text-align: center;
-    border-radius: 8px;
-    border: 1px solid #ddd;
+
     position: absolute;
     top: 0;
     left: 0;
@@ -234,14 +237,15 @@ onBeforeUnmount(() => {
     height: 100%;
     backface-visibility: hidden;
     transition: .5s ease-in-out;
+    overflow: hidden;
 
     &--front {
-      border-left: 10px solid #ddd;
+      // border-left: 10px solid #ddd;
     }
 
     &--back {
       transform: rotateY(0.5turn);
-      border-right: 10px solid #ddd;
+      // border-right: 10px solid #ddd;
     }
   }
 }
