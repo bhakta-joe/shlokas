@@ -14,6 +14,10 @@
     <div class="card__face card__face--back">
       <slot name="answer" />
     </div>
+
+    <div class="overlay">
+      <slot name="overlay" />
+    </div>
   </div>
 </template>
 
@@ -36,7 +40,7 @@ const props = defineProps<{
   index: number,
   swipeThreshold: number,
 }>()
-const emit = defineEmits(['swiped', 'swiping', 'rejected'])
+const emit = defineEmits(['swiped', 'swiping'])
 
 
 /* -------------------------------------------------------------------------- */
@@ -51,10 +55,21 @@ const posY = ref<number>(0)
 const angle = ref<number>(0)
 const scale = ref<number>(.95)
 
-const mark = computed<number>(function () {
-  if (posX.value > props.swipeThreshold) { return posX.value - props.swipeThreshold }
-  if (posX.value < -props.swipeThreshold) { return posX.value + props.swipeThreshold }
+const distance = computed<number>(function () {
+  const xaxis = Math.abs(posX.value) > Math.abs(posY.value)
+  const value = xaxis ? posX.value : posY.value
+  if (value > props.swipeThreshold) { return value - props.swipeThreshold }
+  if (value < -props.swipeThreshold) { return value + props.swipeThreshold }
   return 0;
+})
+const direction = computed<string>(function () {
+  const xaxis = Math.abs(posX.value) > Math.abs(posY.value)
+  return (
+     xaxis && posX.value > 0 ? "right"  :
+     xaxis && posX.value < 0 ? "left"   :
+    !xaxis && posY.value > 0 ? "bottom" :
+    !xaxis && posY.value < 0 ? "top"    : "unknown"
+  )
 })
 const zindex = computed(() => 3 - props.index)
 const transform = computed(() => `translate(${posX.value}px, ${posY.value}px) rotate(${angle.value}deg) scale(${scale.value})`)
@@ -90,11 +105,11 @@ function enableInteraction() {
       },
       move(event) {
         if (props.index !== 0) { return }
-        onMove(event.dx, event.dy)
+        onSwiping(event.dx, event.dy)
       },
       end(event) {
-        event.target.style.transition = "0.5s ease-in-out"
-        onMoved()
+        event.target.style.transition = "0.25s ease-in-out"
+        onSwiped()
       }
     }
   })
@@ -108,7 +123,7 @@ function disableInteraction() {
 /*                                  Handlers                                  */
 /* -------------------------------------------------------------------------- */
 
-function onMove(dx: number, dy: number) {
+function onSwiping(dx: number, dy: number) {
   posX.value += dx
   posY.value += dy
 
@@ -116,25 +131,34 @@ function onMove(dx: number, dy: number) {
   if (angle.value > 15) { angle.value = 15 }
   if (angle.value < -15) { angle.value = -15 }
 
-  emit('swiping', mark.value)
+
+  emit('swiping', {
+    direction: direction.value,
+    value: distance.value
+  })
 }
 
-function onMoved() {
-  if (Math.abs(posY.value) > 100) {
-    posY.value *= 8
-    disableInteraction()
-    emit('rejected')
-    return
-  }
+function onSwiped() {
+  // if (Math.abs(posY.value) > 100) {
+  //   posY.value *= 8
+  //   disableInteraction()
+  //   emit('rejected')
+  //   return
+  // }
 
-  if (mark.value != 0) {
+  if (distance.value != 0) {
     angle.value *= 2
-    posX.value *= 8
-    emit('swiped', mark.value)
+    if (direction.value == "left") posX.value *= 8
+    if (direction.value == "right") posX.value *= 8
+    if (direction.value == "top") posY.value *= 8
+    if (direction.value == "bottom") posY.value *= 8
+
+    emit('swiped', { direction: direction.value, value: distance.value })
   } else {
     posX.value = 0
     posY.value = 0
     angle.value = 0
+    emit('swiping', { direction: "none", value: 0})
   }
 }
 
@@ -143,7 +167,8 @@ function onMoved() {
 /* -------------------------------------------------------------------------- */
 onMounted(() => {
   watch(() => props.index, (index: number) => {
-    setTimeout(() => reset(index), 1)
+    // setTimeout(() => reset(index), 10)
+    reset(index)
   }, { immediate: true })
 
   enableInteraction()
@@ -164,7 +189,7 @@ onBeforeUnmount(() => {
 
   perspective: 1800px;
   position: absolute;
-  transition: .5s;
+  transition: .5s cubic-bezier(0.34, 1.56, 0.64, 1);
   //transform .5s cubic-bezier(0.34, 1.56, 0.64, 1);
   touch-action: none;
   user-select: none;
@@ -173,11 +198,33 @@ onBeforeUnmount(() => {
 
   will-change: transform;
 
+  .overlay {
+    padding: 20px;
+    // text-align: center;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    // backface-visibility: hidden;
+    overflow: hidden;
+    // transition: .5s ease-in-out;
+    // &--front {
+    //   border-left: 10px solid #ddd;
+    // }
+    // &--back {
+    //   transform: rotateY(0.5turn);
+    //   border-right: 10px solid #ddd;
+    // }
+  }
+
   .card__face {
     outline: 1px solid transparent;
     background-color: white;
     padding: 20px;
-    text-align: center;
+    // text-align: center;
     border-radius: 8px;
     border: 1px solid #ddd;
     position: absolute;

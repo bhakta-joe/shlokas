@@ -26,9 +26,24 @@
         :key="card.id"
         :index="card.index"
         :swipe-threshold="settings.minSlideToMarkCard"
-        @swiped="cardSwiped"
-        @rejected="rejected"
+        @swiped="(d) => cardSwiped(card, d)"
+        @swiping="(d) => onSwiping(card, d)"
       >
+        <template #overlay>
+          <div
+            style="transition: .5s"
+            :class="{ 'invisible': !card.showStudiedOverlay, 'overlay': true }"
+          >
+            😎 Выучил
+          </div>
+          <div
+            style="transition: .5s"
+            :class="{ 'invisible': !card.showStudyingOverlay, 'overlay': true }"
+          >
+            🌀 Ещё учу
+          </div>
+        </template>
+
         <template #question>
           <div
             v-if="card.type === InboxTypeCard.text"
@@ -101,17 +116,23 @@ interface RevieInboxCardViewModel {
   id: string,
   type: InboxTypeCard
   verse: Verse | undefined,
-  index: number
+  index: number,
+  showStudiedOverlay: boolean,
+  showStudyingOverlay: boolean
 }
 
 
 const cards = ref<RevieInboxCardViewModel[]>([])
+
+
 function updateViewModel() {
   cards.value = inboxStore.readyForReview.map(x => ({
     id: x.id,
     type: x.type,
     verse: verses.find(v => v.number === x.verseId),
-    index: 0
+    index: 0,
+    showStudiedOverlay: false,
+    showStudyingOverlay: false
   }))
   cards.value[0].index = 0
   cards.value[1].index = 1
@@ -120,23 +141,32 @@ function updateViewModel() {
 
 // const reviewCount = cards.value.length
 
-function cardSwiped() {
-  setTimeout(() => {
-    // const first = cards.value.shift()
-    // if (first) { cards.value.push(first) }
-    // cards.value.reverse()
-      cards.value[0].index = 1-cards.value[0].index
-      cards.value[1].index = 1-cards.value[1].index
-  }, 250)
+function onSwiping(card: RevieInboxCardViewModel, { direction, value }) {
+  console.log(direction, value)
+  card.showStudiedOverlay = (
+    direction == "top" && value !== 0
+  )
+  card.showStudyingOverlay = (
+    (direction === "left" || direction === "right") && value !== 0
+  )
 }
 
-function rejected() {
-   setTimeout(() => {
-    const first = cards.value.shift()
-    if (first) {
-      inboxStore.mark(first?.id)
+function cardSwiped(card, { direction, value }) {
+  setTimeout(() => {
 
-      const verseId = first.verse?.number || ""
+    // console.log(card, direction, value)
+    card.showStudiedOverlay = false
+    card.showStudyingOverlay= false
+
+    if (direction == "left" || direction == "right") {
+      cards.value[0].index = 1 - cards.value[0].index
+      cards.value[1].index = 1 - cards.value[1].index
+    } else if (direction == "top" || direction == "bottom") {
+      const first = cards.value.shift()
+      if (first) {
+        inboxStore.mark(first?.id)
+
+        const verseId = first.verse?.number || ""
         const allReviewd = inboxStore.isAllReviewdByVerse(verseId)
         if (first.type == InboxTypeCard.text) {
           reviewStore.addCard(verseId, "text:number")
@@ -150,6 +180,7 @@ function rejected() {
           reviewStore.addCard(verseId, "text:translation")
         }
       }
+    }
 
   }, 500)
 }
@@ -175,6 +206,18 @@ async function openModal() {
   width: 100%;
   height: 100%;
   background-color: antiquewhite;
+}
+
+.overlay {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  font-size: 6vw;
+  background-color: white;
 }
 
 .front {
@@ -216,6 +259,10 @@ async function openModal() {
 
 .word {
   font-weight: bold;
+}
+
+.invisible {
+  opacity: 0;
 }
 </style>
 
