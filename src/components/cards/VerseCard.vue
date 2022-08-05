@@ -2,20 +2,17 @@
   <div
     ref="card"
     class="card"
-    :class="{
-      'open': flipped,
-    }"
     @click="flip"
   >
-    <div class="card__face card__face--front">
+    <div class="face face--front">
       <slot name="question" />
     </div>
 
-    <div class="card__face card__face--back">
+    <div class="face face--back">
       <slot name="answer" />
     </div>
 
-    <div class="card__face">
+    <div class="face">
       <slot name="overlay" />
     </div>
   </div>
@@ -23,7 +20,7 @@
 
 <script lang="ts" setup>
 // Interact
-import interact from "interactjs";
+import interact from 'interactjs';
 import { Target } from '@interactjs/types';
 
 // Vue
@@ -48,12 +45,13 @@ const emit = defineEmits(['swiped', 'swiping'])
 /* -------------------------------------------------------------------------- */
 
 const card = ref()
-
 const flipped = ref<boolean>(false)
 const posX = ref<number>(0)
 const posY = ref<number>(0)
 const angle = ref<number>(0)
 const scale = ref<number>(.95)
+const flipAngle = computed(() => flipped.value ? 180 : 0)
+const zindex = computed(() => 2 - props.index)
 
 const distance = computed<number>(function () {
   const xaxis = Math.abs(posX.value) > Math.abs(posY.value)
@@ -71,9 +69,6 @@ const direction = computed<string>(function () {
     !xaxis && posY.value < 0 ? "top"    : "unknown"
   )
 })
-const zindex = computed(() => 3 - props.index)
-const transform = computed(() => `translate(${posX.value}px, ${posY.value}px) rotate(${angle.value}deg) scale(${scale.value})`)
-
 
 /* -------------------------------------------------------------------------- */
 /*                                   Action                                   */
@@ -88,7 +83,6 @@ function reset(index: number) {
   } else {
     card.value.style.transition = ".5s cubic-bezier(0.34, 1.56, 0.64, 1)"
   }
-
   scale.value = 1 - (0.1 * index)
 }
 
@@ -131,7 +125,6 @@ function onSwiping(dx: number, dy: number) {
   if (angle.value > 15) { angle.value = 15 }
   if (angle.value < -15) { angle.value = -15 }
 
-
   emit('swiping', {
     direction: direction.value,
     value: distance.value
@@ -139,13 +132,6 @@ function onSwiping(dx: number, dy: number) {
 }
 
 function onSwiped() {
-  // if (Math.abs(posY.value) > 100) {
-  //   posY.value *= 8
-  //   disableInteraction()
-  //   emit('rejected')
-  //   return
-  // }
-
   if (distance.value != 0) {
     angle.value *= 2
     if (direction.value == "left") posX.value *= 8
@@ -167,7 +153,6 @@ function onSwiped() {
 /* -------------------------------------------------------------------------- */
 onMounted(() => {
   watch(() => props.index, (index: number) => {
-    // setTimeout(() => reset(index), 10)
     reset(index)
   }, { immediate: true })
 
@@ -180,56 +165,27 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+$x: calc(v-bind(posX) * 1px);
+$y: calc(v-bind(posY) * 1px);
+$angle: calc(v-bind(angle) * 1deg);
+$scale: v-bind(scale);
+$flipAngleFront: calc(v-bind(flipAngle) * 1deg);
+$flipAngleBack: calc($flipAngleFront + 180deg);
+
 .card {
-  color: black;
   width: calc(100% - 20px);
   height: calc(100% - 20px);
-
   margin: 10px;
-
   perspective: 1800px;
   position: absolute;
   transition: .5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  //transform .5s cubic-bezier(0.34, 1.56, 0.64, 1);
   touch-action: none;
   user-select: none;
   z-index: v-bind(zindex);
-  transform: v-bind(transform);
-  // overflow: hidden;
-
+  transform: translate($x, $y) rotate($angle) scale($scale);
   will-change: transform;
 
-  .overlay {
-    // padding: 20px;
-    // text-align: center;
-    // border-radius: 8px;
-    // border: 1px solid #ddd;
-    position: absolute;
-
-    top: 0;
-    left: 0;
-    // transform: translate(50%, 50%);
-    width: 100%;
-    height: 100%;
-
-    // backface-visibility: hidden;
-    // overflow: hidden;
-    // transition: .5s ease-in-out;
-    // &--front {
-    //   border-left: 10px solid #ddd;
-    // }
-    // &--back {
-    //   transform: rotateY(0.5turn);
-    //   border-right: 10px solid #ddd;
-    // }
-  }
-
-  .card__face {
-    // outline: 1px solid transparent;
-    // background-color: white;
-    // padding: 20px;
-    // text-align: center;
-
+  .face {
     position: absolute;
     top: 0;
     left: 0;
@@ -240,22 +196,12 @@ onBeforeUnmount(() => {
     overflow: hidden;
 
     &--front {
-      // border-left: 10px solid #ddd;
+      transform: rotateY($flipAngleFront)
     }
 
     &--back {
-      transform: rotateY(0.5turn);
-      // border-right: 10px solid #ddd;
+      transform: rotateY($flipAngleBack)
     }
   }
-}
-
-
-.open>.card__face--back {
-  transform: rotateY(0turn);
-}
-
-.open>.card__face--front {
-  transform: rotateY(-0.5turn);
 }
 </style>
