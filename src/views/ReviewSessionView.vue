@@ -12,7 +12,7 @@
       :scroll-x="false"
       color="light"
     >
-      <VerseCard
+      <FlipCard
         v-for="card, idx in cards.slice(0, 1)"
         :key="card.card.id"
         :visible="card.visible"
@@ -21,53 +21,107 @@
         @marked="marked"
         @marking="marking"
       >
-        <template v-slot:question>
-          <div v-if="card.card.type === 'text:number'" class="front">
-            <div class="q">Number</div>
+        <template #front>
+          <div
+            v-if="card.card.type === 'text:number'"
+            class="front"
+          >
+            <div class="q">
+              Number
+            </div>
             <verse-lines :text="card.verse?.text || ''" />
           </div>
-          <div v-if="card.card.type === 'translation:number'" class="front">
-            <div class="q">Number</div>
+          <div
+            v-if="card.card.type === 'translation:number'"
+            class="front"
+          >
+            <div class="q">
+              Number
+            </div>
             <div>{{ card.verse?.translation }}</div>
           </div>
-          <div v-if="card.card.type === 'number:text'" class="front">
-            <div class="number">{{ card.verse?.number }}</div>
+          <div
+            v-if="card.card.type === 'number:text'"
+            class="front"
+          >
+            <div class="number">
+              {{ card.verse?.number }}
+            </div>
           </div>
-          <div v-if="card.card.type === 'number:translation'" class="front">
-            <div class="q">Translation</div>
-            <div class="number">{{ card.verse?.number }}</div>
+          <div
+            v-if="card.card.type === 'number:translation'"
+            class="front"
+          >
+            <div class="q">
+              Translation
+            </div>
+            <div class="number">
+              {{ card.verse?.number }}
+            </div>
           </div>
-          <div v-if="card.card.type === 'translation:text'" class="front">
-            <div class="q">Text</div>
+          <div
+            v-if="card.card.type === 'translation:text'"
+            class="front"
+          >
+            <div class="q">
+              Text
+            </div>
             <div>{{ card.verse?.translation }}</div>
           </div>
-          <div v-if="card.card.type === 'text:translation'" class="front">
-            <div class="q">Translation</div>
+          <div
+            v-if="card.card.type === 'text:translation'"
+            class="front"
+          >
+            <div class="q">
+              Translation
+            </div>
             <verse-lines :text="card.verse?.text || ''" />
           </div>
         </template>
 
-        <template v-slot:answer>
-          <div v-if="card.card.type === 'text:number'" class="back">
-            <div class="a number">{{ card.verse?.number }}</div>
+        <template #back>
+          <div
+            v-if="card.card.type === 'text:number'"
+            class="back"
+          >
+            <div class="a number">
+              {{ card.verse?.number }}
+            </div>
           </div>
-          <div v-if="card.card.type === 'translation:number'" class="back">
-            <div class="a number">{{ card.verse?.number }}</div>
+          <div
+            v-if="card.card.type === 'translation:number'"
+            class="back"
+          >
+            <div class="a number">
+              {{ card.verse?.number }}
+            </div>
           </div>
-          <div v-if="card.card.type === 'number:text'" class="back">
+          <div
+            v-if="card.card.type === 'number:text'"
+            class="back"
+          >
             <verse-lines :text="card.verse?.text || ''" />
           </div>
-          <div v-if="card.card.type === 'number:translation'" class="back">
+          <div
+            v-if="card.card.type === 'number:translation'"
+            class="back"
+          >
             <div>{{ card.verse?.translation }}</div>
           </div>
-          <div v-if="card.card.type === 'translation:text'" class="back">
+          <div
+            v-if="card.card.type === 'translation:text'"
+            class="back"
+          >
             <verse-lines :text="card.verse?.text || ''" />
           </div>
-          <div v-if="card.card.type === 'text:translation'" class="back">
+          <div
+            v-if="card.card.type === 'text:translation'"
+            class="back"
+          >
             <div>{{ card.verse?.translation }}</div>
           </div>
         </template>
-      </VerseCard>
+      </FlipCard>
 
       <div class="mark">
         {{ toHumanMark(currentCardMark) }}
@@ -80,7 +134,7 @@
 <script lang="ts" setup>
 import { IonPage, IonHeader, IonToolbar, IonProgressBar, IonContent } from '@ionic/vue';
 
-import VerseCard from '@/components/cards/VerseCard.vue';
+import FlipCard from '@/components/cards/FlipCard.vue';
 import VerseLines from '@/components/VerseLines.vue';
 
 import { ref, computed } from 'vue'

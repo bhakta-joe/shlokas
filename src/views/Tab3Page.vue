@@ -5,7 +5,7 @@
         <ion-title>
           <ion-badge>{{ cards.length }}</ion-badge>&nbsp;
         </ion-title>
-        <ion-progress-bar :value="progress"/>
+        <ion-progress-bar :value="progress" />
       </ion-toolbar>
     </ion-header>
 
@@ -15,33 +15,36 @@
       :scroll-x="false"
       color="light"
     >
-        <VerseCard
-          v-for="card, idx in cards"
-          :key="card.id"
-          :visible="card.visible"
-          :index="reviewCount-idx"
-          :swipeThreshold="answer_threshold"
-          @reviewed="out"
-          @rating="rating"
-        >
-          <template v-slot:question>
-            QUESTION Card #{{ card.id }} {{ card.visible }}
-          </template>
-          <template v-slot:answer>
-            ANSWER Card #{{ card.id }} {{ card.visible }}
-          </template>
-        </VerseCard>
+      <FlipCard
+        v-for="card, idx in cards"
+        :key="card.id"
+        :visible="card.visible"
+        :index="reviewCount-idx"
+        :swipe-threshold="answer_threshold"
+        @reviewed="out"
+        @rating="rating"
+      >
+        <template #front>
+          QUESTION Card #{{ card.id }} {{ card.visible }}
+        </template>
+        <template #back>
+          ANSWER Card #{{ card.id }} {{ card.visible }}
+        </template>
+      </FlipCard>
 
-        <div class="mark" v-if="showMarkLabel">
-          {{ toHumanMark(currentCardMark) }}
-        </div>
+      <div
+        v-if="showMarkLabel"
+        class="mark"
+      >
+        {{ toHumanMark(currentCardMark) }}
+      </div>
     </ion-content>
   </ion-page>
 </template>
 
 <script lang="ts" setup>
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonBadge, IonProgressBar, IonContent } from '@ionic/vue';
-import VerseCard from '@/components/cards/VerseCard.vue';
+import FlipCard from '@/components/cards/FlipCard.vue';
 import { ref, computed } from 'vue'
 
 interface ReviewCardViewModel {

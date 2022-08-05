@@ -59,7 +59,7 @@ const isFinished = computed(() => props.state === 'finished')
 
 
 <i18n locale="en" lang="yaml">
-in-progress: Inbox
+in-progress: In progress
 finished: Add
 </i18n>
 

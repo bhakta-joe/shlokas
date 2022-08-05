@@ -2,14 +2,14 @@
   <div
     ref="card"
     class="card"
-    @click="flip"
+    @click="onCardClicked"
   >
     <div class="face face--front">
-      <slot name="question" />
+      <slot name="front" />
     </div>
 
     <div class="face face--back">
-      <slot name="answer" />
+      <slot name="back" />
     </div>
 
     <div class="face">
@@ -86,10 +86,6 @@ function reset(index: number) {
   scale.value = 1 - (0.1 * index)
 }
 
-function flip() {
-  flipped.value = !flipped.value
-}
-
 function enableInteraction() {
   interact(card.value as Target).draggable({
     listeners: {
@@ -116,6 +112,10 @@ function disableInteraction() {
 /* -------------------------------------------------------------------------- */
 /*                                  Handlers                                  */
 /* -------------------------------------------------------------------------- */
+
+function onCardClicked() {
+  flipped.value = !flipped.value
+}
 
 function onSwiping(dx: number, dy: number) {
   posX.value += dx
@@ -151,6 +151,7 @@ function onSwiped() {
 /* -------------------------------------------------------------------------- */
 /*                                    Hooks                                   */
 /* -------------------------------------------------------------------------- */
+
 onMounted(() => {
   watch(() => props.index, (index: number) => {
     reset(index)
