@@ -1,9 +1,12 @@
 <template>
   <ion-page>
     <ion-tabs>
-      <ion-router-outlet></ion-router-outlet>
+      <ion-router-outlet />
       <ion-tab-bar slot="bottom">
-        <ion-tab-button tab="tab1" href="/tabs/tab1">
+        <ion-tab-button
+          tab="tab1"
+          href="/tabs/inbox"
+        >
           <ion-icon :icon="enterOutline" />
           <ion-label>{{ t('inbox') }}</ion-label>
           <ion-badge v-if="inboxStore.cards.length">
@@ -11,7 +14,10 @@
           </ion-badge>
         </ion-tab-button>
 
-        <ion-tab-button tab="tab2" href="/tabs/tab2">
+        <ion-tab-button
+          tab="tab2"
+          href="/tabs/tab2"
+        >
           <ion-icon :icon="fileTrayFullOutline" />
           <ion-label>{{ t('review') }}</ion-label>
           <ion-badge v-if="reviewStore.readyForReview.length">
@@ -19,7 +25,10 @@
           </ion-badge>
         </ion-tab-button>
 
-        <ion-tab-button tab="tab3" href="/tabs/tab3">
+        <ion-tab-button
+          tab="tab3"
+          href="/tabs/tab3"
+        >
           <ion-icon :icon="cogOutline" />
           <ion-label>{{ t('settings') }}</ion-label>
         </ion-tab-button>

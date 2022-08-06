@@ -21,7 +21,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'tab2',
-        component: () => import('@/views/ReviewSessionView.vue')
+        component: () => import('@/views/ReviewView.vue')
       },
       {
         path: 'tab3',

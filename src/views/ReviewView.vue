@@ -13,14 +13,18 @@
       color="light"
     >
       <FlipCard
-        v-for="card, idx in cards.slice(0, 1)"
+        v-for="card, idx in cards"
         :key="card.card.id"
-        :visible="card.visible"
-        :index="reviewCount - idx"
+        :index="idx"
         :swipe-threshold="settings.swipeThreshold"
-        @marked="marked"
-        @marking="marking"
+        :swipe-directions="swipeDirections"
+        @swiped="onTopCardSwiped"
+        @swiping="onTopCardSwiping"
       >
+        <template #overlay>
+          <CardProgressOverlay :grade="card.grade" />
+        </template>
+
         <template #front>
           <div
             v-if="card.card.type === 'text:number'"
@@ -122,10 +126,6 @@
           </div>
         </template>
       </FlipCard>
-
-      <div class="mark">
-        {{ toHumanMark(currentCardMark) }}
-      </div>
     </ion-content>
   </ion-page>
 </template>
@@ -133,75 +133,56 @@
 
 <script lang="ts" setup>
 import { IonPage, IonHeader, IonToolbar, IonProgressBar, IonContent } from '@ionic/vue';
-
 import FlipCard from '@/components/cards/FlipCard.vue';
+import CardProgressOverlay from '@/components/review/CardProgressOverlay.vue'
 import VerseLines from '@/components/VerseLines.vue';
-
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { settings } from '@/lib/settings'
 import { ReviewCard, useReviewStore } from '@/stores/review';
-import { Verse, verses } from '@/lib/verses';
+import { Verse, getVerse } from '@/lib/verses';
 
 const reviewStore = useReviewStore()
 
 interface ReviewCardViewModel {
   card: ReviewCard
-  visible: boolean
-  verse: Verse | undefined
+  verse: Verse
+  grade: number
 }
 
-
+const swipeDirections = ['left', 'right']
 const progress = computed(() => 1 - cards.value.length / reviewCount)
-const currentCardMark = ref<number>(0)
-const markColor = computed(() => currentCardMark.value < 0 ? "#ffe2e2" : "#e2ffe9")
-const showMarkLabel = ref<number>(0)
 
 const cards = ref<ReviewCardViewModel[]>([])
-reviewStore.readyForReview.forEach((card: ReviewCard) => {
-  cards.value.push({
-    card: card,
-    verse: verses.find(v => v.number === card.verseId),
-    visible: false
-  })
-})
-cards.value[0].visible = true
+function updateViewModel() {
+  cards.value = reviewStore.readyForReview.map(x => ({
+    card: x,
+    verse: getVerse(x.verseId),
+    grade: 0
+  }))
+}
 
 const reviewCount = cards.value.length
 
-function marked(value: number) {
+function onTopCardSwiped({ direction, value }) {
   setTimeout(() => cards.value.splice(0, 1), 500)
-  if (cards.value.length > 1) {
-    cards.value[1].visible = true
-    showMarkLabel.value=0
-  }
 }
 
-function marking(value: number) {
-  currentCardMark.value = value
-  if (Math.abs(value) > 0) {
-    showMarkLabel.value = .8
-  } else {
-    showMarkLabel.value = 0
-  }
+function onTopCardSwiping({ direction, value }) {
+  const first = cards.value[0]
+  if (direction === "left")  { first.grade = Math.floor(value / 40) }
+  if (direction === "right") { first.grade = Math.floor(value / 25) }
+  if (first.grade < -2) { first.grade = -2 }
+  if (first.grade > 3)  { first.grade = 3 }
+
+  // first.grade = value
+    // (direction === "top"  || direction === "bottom") && value !== 0 ? "finished" :
+    // (direction === "left" || direction === "right")  && value !== 0 ? "inProgress" : ""
 }
 
-function toHumanMark(value: number): string {
-  if (value < -50) { return "🤯" }
-  if (value < 0) { return "👎" }
-  if (value > 100) { return "🧠 💪" }
-  if (value > 50) { return "👍" }
-  return "👌"
-}
+onMounted(() => updateViewModel())
 </script>
 
 <style scoped>
-.perspective {
-  perspective: 800px;
-  width: 100%;
-  height: 100%;
-  background-color: antiquewhite;
-}
-
 .front {
   display: flex;
   flex-direction: column;
@@ -210,8 +191,11 @@ function toHumanMark(value: number): string {
   align-items: center;
   justify-content: center;
   font-size: 6vw;
-  /* text-align: justify; */
-  /* text-justify: inter-word; */
+  text-align: center;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
 }
 
 .back {
@@ -222,20 +206,11 @@ function toHumanMark(value: number): string {
   align-items: center;
   justify-content: center;
   font-size: 6vw;
-}
-
-.mark {
-  position: absolute;
-  bottom: 75%;
-  left: 50%;
-  background-color: v-bind(markColor);
-  padding: 10px 25px 10px 25px;
-  border-radius: 5px;
-  z-index: 99999;
-  transform: translate(-50%, -50%);
-  font-size: 16vw;
-  opacity: v-bind(showMarkLabel);
-  transition: 1s ease;
+  text-align: center;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
 }
 
 .q {
@@ -245,10 +220,6 @@ function toHumanMark(value: number): string {
   padding: .4em;
   margin: .4em;
   border-radius: .2em;
-}
-
-.a {
-  /* wew */
 }
 
 .number {
