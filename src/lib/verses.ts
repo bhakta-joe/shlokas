@@ -10,6 +10,16 @@ export interface Verse {
     words?: Word[]
 }
 
+export const EmptyVerse: Verse = {
+  number: "",
+  text: "",
+  translation: ""
+}
+
+export function getVerse(verseId: string) : Verse {
+  return verses.find(x => x.number === verseId) || EmptyVerse
+}
+
 export const verses: Verse[] = [
     {
         number: 'BG 1.1',

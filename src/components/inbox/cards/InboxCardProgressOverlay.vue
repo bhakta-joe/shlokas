@@ -38,7 +38,6 @@ const isFinished = computed(() => props.state === 'finished')
   opacity: 0;
   background-color: white;
 }
-
 .overlay {
   position: absolute;
   display: flex;
@@ -48,12 +47,11 @@ const isFinished = computed(() => props.state === 'finished')
   justify-content: center;
   font-size: 9vw;
   background-color: white;
-  transition: .5s;
+  transition: .25s;
   text-align: center;
 
   border-radius: 8px;
   border: 1px solid #ddd;
-  /* border-bottom: 10px solid #ddd; */
 }
 </style>
 

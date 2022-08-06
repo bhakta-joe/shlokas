@@ -39,27 +39,29 @@
             v-if="card.type === InboxTypeCard.text"
             class="front"
           >
-            <div class="q">
-              {{ card.verse?.number }}
+            <div class="number">
+              {{ card.verse.number }}
             </div>
-            <verse-lines :text="card.verse?.text || ''" />
+            <VerseLines :text="card.verse.text || ''" />
           </div>
+
           <div
             v-if="card.type === InboxTypeCard.transaltion"
             class="front"
           >
-            <div class="q">
-              {{ card.verse?.number }}
+            <div class="number">
+              {{ card.verse.number }}
             </div>
-            <div>{{ card.verse?.translation }}</div>
+            <div>{{ card.verse.translation }}</div>
           </div>
         </template>
 
         <template #back>
-          <WordByWordTranslationSide :words="card.verse?.words || []" />
+          <WordByWordTranslationSide :words="card.verse.words || []" />
         </template>
       </FlipCard>
 
+      <!-- Inbox deck is empty -->
       <InboxEmpty
         v-if="inboxStore.isEmpty"
         @click="openModal"
@@ -85,7 +87,7 @@ import { settings } from '@/lib/settings'
 import { useInboxStore } from '@/stores/inbox'
 import { useReviewStore } from '@/stores/review'
 import { InboxTypeCard } from '@/stores/inbox'
-import { Verse, verses } from '@/lib/verses'
+import { Verse, getVerse } from '@/lib/verses'
 import { useI18n } from 'vue-i18n'
 import InboxCardProgressOverlay from '@/components/inbox/cards/InboxCardProgressOverlay.vue'
 import WordByWordTranslationSide from '@/components/inbox/cards/WordByWordTranslationSide.vue'
@@ -97,28 +99,24 @@ const { t } = useI18n()
 interface RevieInboxCardViewModel {
   id: string,
   type: InboxTypeCard
-  verse: Verse | undefined,
+  verse: Verse
   progress: string
 }
 
 
 const cards = ref<RevieInboxCardViewModel[]>([])
-const topCards = computed(() => cards.value.slice(0,2))
 const swipeDirections = computed(() => {
   return cards.value.length > 1 ? ['top', 'bottom', 'left', 'right'] : ['top', 'bottom']
 })
 
 function updateViewModel() {
-  cards.value = inboxStore.readyForReview.map((x, idx) => ({
+  cards.value = inboxStore.readyForReview.map(x => ({
     id: x.id,
     type: x.type,
-    verse: verses.find(v => v.number === x.verseId),
+    verse: getVerse(x.verseId),
     progress: ""
   }))
 }
-
-
-// const reviewCount = cards.value.length
 
 function onTopCardSwiping({ direction, value }) {
   const first = cards.value[0]
@@ -136,9 +134,9 @@ function onTopCardSwiped({ direction }) {
     if (direction == "left" || direction == "right") {
         cards.value.push(first)
     } else if (direction == "top" || direction == "bottom") {
-      inboxStore.mark(first?.id)
+      inboxStore.mark(first.id)
 
-      const verseId = first.verse?.number || ""
+      const verseId = first.verse.number || ""
       const allReviewd = inboxStore.isAllReviewdByVerse(verseId)
       if (first.type == InboxTypeCard.text) {
         reviewStore.addCard(verseId, "text:number")
@@ -172,13 +170,6 @@ async function openModal() {
 </script>
 
 <style scoped>
-.perspective {
-  perspective: 800px;
-  width: 100%;
-  height: 100%;
-  background-color: antiquewhite;
-}
-
 .front {
   display: flex;
   flex-direction: column;
@@ -190,27 +181,17 @@ async function openModal() {
   text-align: center;
   background-color: white;
   padding: 20px;
-
   border-radius: 8px;
   border: 1px solid #ddd;
-  /* border-bottom: 10px solid #ddd; */
 }
 
-.q {
+.number {
   text-transform: uppercase;
-  font-size: 6vw;
   background-color: lightblue;
   padding: .4em;
   margin: .4em;
   border-radius: .2em;
-}
-
-.a {
-  /* wew */
-}
-
-.number {
-  font-size: 12vw;
+  font-size: 6vw;
 }
 </style>
 
