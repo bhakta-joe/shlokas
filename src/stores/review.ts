@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
 
 export type ReviewCard = {
-  id: string,
-  verseId: string,
-  type: string,
+  id: string
+  verseId: string
+  type: string
   reviewDate: Date
+  ease: number
 }
 
 export type ReviewState = {
@@ -20,7 +21,9 @@ export const useReviewStore = defineStore('review', {
   actions: {
     addCard(verseId: string, type: string) {
       const id = (Math.random() + 1).toString(36).substring(7);
-      this.cards.push({ id, verseId, type, reviewDate: new Date() })
+      this.cards.push({
+        id, verseId, type, reviewDate: new Date(), ease: 120
+      })
     },
     markReviewed() {
       const current = this.readyForReview[0]

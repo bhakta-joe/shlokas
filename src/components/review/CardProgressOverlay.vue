@@ -3,9 +3,17 @@
     class="overlay"
     :class="{'invisible':!isVisible}"
   >
-    <span v-if="props.grade !== 0">
+    <div
+      v-if="props.grade !== 0"
+      class="grade"
+    >
       {{ t('grade_' + props.grade) }}
-    </span>
+    </div>
+    <div
+      class="date"
+    >
+      {{ t('in-days', nextReviewInDays) }}
+    </div>
   </div>
 </template>
 
@@ -16,6 +24,7 @@ import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   grade: number,
+  nextReviewInDays: number,
 }>()
 const { t } = useI18n()
 const isVisible = computed(() => props.grade !== 0)
@@ -41,11 +50,11 @@ const color = computed(function() {
 .overlay {
   position: absolute;
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   align-items: center;
   justify-content: center;
-  font-size: 9vw;
   /* background-color: v-bind(color); */
   background-color: white;
   transition: .25s;
@@ -55,21 +64,31 @@ const color = computed(function() {
   border: 5px solid v-bind(color);
   /* border-color: v-bind(color); */
 }
+
+.grade {
+  font-size: 9vw;
+}
+
+.date {
+  font-size: 3vw;
+}
 </style>
 
 
 <i18n locale="en" lang="yaml">
-grade_-2: 🤦‍♂️ Фиаско
-grade_-1: 👎 Лошара
-grade_1: 😕 Так себе
-grade_2: 👍 Хорошо
-grade_3: 😎 Отлично
+grade_-2: 🤦‍♂️ Forgot
+grade_-1: 👎 Forgot
+grade_1: 😕 Bad
+grade_2: 👍 Good
+grade_3: 😎 Excellent
+in-days: today | +{n} day | +{n} days
 </i18n>
 
 <i18n locale="ru" lang="yaml">
-grade_-2: 🤦‍♂️ Фиаско
-grade_-1: 👎 Лошара
-grade_1: 😕 Так себе
+grade_-2: 🤦‍♂️ Не помню
+grade_-1: 👎 Не помню
+grade_1: 😕 Плохо
 grade_2: 👍 Хорошо
 grade_3: 😎 Отлично
+in-days: сегодня | +{n} д | +{n} д
 </i18n>

@@ -2,7 +2,10 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-progress-bar :value="progress" />
+        <ion-progress-bar
+          v-if="!empty"
+          :value="progress"
+        />
       </ion-toolbar>
     </ion-header>
 
@@ -22,7 +25,10 @@
         @swiping="onTopCardSwiping"
       >
         <template #overlay>
-          <CardProgressOverlay :grade="card.grade" />
+          <CardProgressOverlay
+            :grade="card.grade"
+            :next-review-in-days="card.nextReviewInDays"
+          />
         </template>
 
         <template #front>
@@ -126,17 +132,21 @@
           </div>
         </template>
       </FlipCard>
+
+      <!-- Inbox deck is empty -->
+      <ReviewEmpty v-if="empty" />
     </ion-content>
   </ion-page>
 </template>
 
 
 <script lang="ts" setup>
-import { IonPage, IonHeader, IonToolbar, IonProgressBar, IonContent } from '@ionic/vue';
+import { IonPage, IonHeader, IonToolbar, IonProgressBar, IonContent, onIonViewDidEnter } from '@ionic/vue';
+import ReviewEmpty from '@/components/review/ReviewEmpty.vue'
 import FlipCard from '@/components/cards/FlipCard.vue';
 import CardProgressOverlay from '@/components/review/CardProgressOverlay.vue'
 import VerseLines from '@/components/VerseLines.vue';
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { settings } from '@/lib/settings'
 import { ReviewCard, useReviewStore } from '@/stores/review';
 import { Verse, getVerse } from '@/lib/verses';
@@ -147,24 +157,38 @@ interface ReviewCardViewModel {
   card: ReviewCard
   verse: Verse
   grade: number
+  nextReviewInDays: number
 }
 
 const swipeDirections = ['left', 'right']
-const progress = computed(() => 1 - cards.value.length / reviewCount)
+const progress = computed(() => 1 - cards.value.length / reviewCount.value)
+const empty = computed(() => cards.value.length === 0)
 
 const cards = ref<ReviewCardViewModel[]>([])
 function updateViewModel() {
   cards.value = reviewStore.readyForReview.map(x => ({
     card: x,
     verse: getVerse(x.verseId),
-    grade: 0
+    grade: 0,
+    nextReviewInDays: 0
   }))
+  reviewCount.value = cards.value.length
 }
 
-const reviewCount = cards.value.length
+const reviewCount = ref(0)
 
 function onTopCardSwiped({ direction, value }) {
-  setTimeout(() => cards.value.splice(0, 1), 500)
+  setTimeout(() => {
+    const first = cards.value.shift()
+    if (!first) { return }
+
+    if (first.grade < 0) {
+      cards.value.push(first)
+    } else {
+      // cards.value.splice(0, 1)
+    }
+
+  }, 500)
 }
 
 function onTopCardSwiping({ direction, value }) {
@@ -174,12 +198,16 @@ function onTopCardSwiping({ direction, value }) {
   if (first.grade < -2) { first.grade = -2 }
   if (first.grade > 3)  { first.grade = 3 }
 
-  // first.grade = value
-    // (direction === "top"  || direction === "bottom") && value !== 0 ? "finished" :
-    // (direction === "left" || direction === "right")  && value !== 0 ? "inProgress" : ""
+  if (first.grade > 0) {
+    first.nextReviewInDays = first.grade
+  } else {
+    first.nextReviewInDays = 0
+  }
 }
 
-onMounted(() => updateViewModel())
+onIonViewDidEnter(() => {
+  updateViewModel()
+})
 </script>
 
 <style scoped>
