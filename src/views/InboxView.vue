@@ -77,7 +77,7 @@ import {
   IonButtons, IonButton, modalController
 } from '@ionic/vue';
 
-import InboxEmpty from '@/components/InboxEmpty.vue'
+import InboxEmpty from '@/components/inbox/InboxEmpty.vue'
 import FlipCard from '@/components/cards/FlipCard.vue'
 import VerseLines from '@/components/VerseLines.vue'
 import InboxAddVerseDialog from '@/components/inbox/AddVerseDialog.vue'

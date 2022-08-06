@@ -43,6 +43,6 @@ tap-to-add: Tap to add new verses to your inbox.
 </i18n>
 
 <i18n locale="ru" lang="yaml">
-empty: Ты полон пустоты.
-tap-to-add: Жмакни чтобы добавить.
+empty: У вас нет стихов на изучении.
+tap-to-add: Нажмите чтобы добавить.
 </i18n>
