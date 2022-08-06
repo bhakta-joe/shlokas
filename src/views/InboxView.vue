@@ -80,7 +80,7 @@ import {
 import InboxEmpty from '@/components/InboxEmpty.vue'
 import FlipCard from '@/components/cards/FlipCard.vue'
 import VerseLines from '@/components/VerseLines.vue'
-import InboxAddVerseDialog from '@/components/InboxAddVerseDialog.vue'
+import InboxAddVerseDialog from '@/components/inbox/AddVerseDialog.vue'
 
 import { ref, computed } from 'vue'
 import { settings } from '@/lib/settings'
@@ -195,6 +195,8 @@ async function openModal() {
 }
 </style>
 
+
+<i18n src="@/locale/common.yml" lang="yaml" />
 
 <i18n locale="en" lang="yaml">
 add: Add
