@@ -36,6 +36,7 @@ import { onMounted, onBeforeUnmount } from 'vue'
 const props = defineProps<{
   index: number,
   swipeThreshold: number,
+  swipeDirections: string[],
 }>()
 const emit = defineEmits(['swiped', 'swiping'])
 
@@ -83,7 +84,7 @@ function reset(index: number) {
   } else {
     card.value.style.transition = ".5s cubic-bezier(0.34, 1.56, 0.64, 1)"
   }
-  scale.value = 1 - (0.1 * index)
+  scale.value = index === 0 ? 1 : .95 //1 - (0.1 * index)
 }
 
 function enableInteraction() {
@@ -132,7 +133,9 @@ function onSwiping(dx: number, dy: number) {
 }
 
 function onSwiped() {
-  if (distance.value != 0) {
+  const canSwipedInDirection = props.swipeDirections.includes(direction.value)
+
+  if (distance.value != 0 && canSwipedInDirection) {
     angle.value *= 2
     if (direction.value == "left") posX.value *= 8
     if (direction.value == "right") posX.value *= 8
@@ -154,7 +157,7 @@ function onSwiped() {
 
 onMounted(() => {
   watch(() => props.index, (index: number) => {
-    reset(index)
+    setTimeout(() => reset(index), 10) // go fuck yourself safari
   }, { immediate: true })
 
   enableInteraction()

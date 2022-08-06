@@ -22,12 +22,13 @@
       color="light"
     >
       <FlipCard
-        v-for="card in cards.slice(0, 2)"
+        v-for="card, idx in cards"
         :key="card.id"
-        :index="card.index"
-        :swipe-threshold="settings.minSlideToMarkCard"
-        @swiped="(d) => cardSwiped(card, d)"
-        @swiping="(d) => onSwiping(card, d)"
+        :index="idx"
+        :swipe-threshold="settings.swipeThreshold"
+        :swipe-directions="swipeDirections"
+        @swiped="onTopCardSwiped"
+        @swiping="onTopCardSwiping"
       >
         <template #overlay>
           <InboxCardProgressOverlay :state="card.progress" />
@@ -79,7 +80,7 @@ import FlipCard from '@/components/cards/FlipCard.vue'
 import VerseLines from '@/components/VerseLines.vue'
 import InboxAddVerseDialog from '@/components/InboxAddVerseDialog.vue'
 
-import { ref, } from 'vue'
+import { ref, computed } from 'vue'
 import { settings } from '@/lib/settings'
 import { useInboxStore } from '@/stores/inbox'
 import { useReviewStore } from '@/stores/review'
@@ -97,64 +98,58 @@ interface RevieInboxCardViewModel {
   id: string,
   type: InboxTypeCard
   verse: Verse | undefined,
-  index: number,
   progress: string
 }
 
 
 const cards = ref<RevieInboxCardViewModel[]>([])
-
+const topCards = computed(() => cards.value.slice(0,2))
+const swipeDirections = computed(() => {
+  return cards.value.length > 1 ? ['top', 'bottom', 'left', 'right'] : ['top', 'bottom']
+})
 
 function updateViewModel() {
-  cards.value = inboxStore.readyForReview.map(x => ({
+  cards.value = inboxStore.readyForReview.map((x, idx) => ({
     id: x.id,
     type: x.type,
     verse: verses.find(v => v.number === x.verseId),
-    index: 0,
     progress: ""
   }))
-  cards.value[0].index = 0
-  cards.value[1].index = 1
 }
 
 
 // const reviewCount = cards.value.length
 
-function onSwiping(card: RevieInboxCardViewModel, { direction, value }) {
-  console.log(direction, value)
-
-  card.progress =
+function onTopCardSwiping({ direction, value }) {
+  const first = cards.value[0]
+  first.progress =
     (direction === "top"  || direction === "bottom") && value !== 0 ? "finished" :
     (direction === "left" || direction === "right")  && value !== 0 ? "inProgress" : ""
 }
 
-function cardSwiped(card, { direction, value }) {
+function onTopCardSwiped({ direction }) {
   setTimeout(() => {
-
-    // console.log(card, direction, value)
-    card.progress = ""
+    const first = cards.value.shift()
+    if (!first) { return }
+    first.progress = ""
 
     if (direction == "left" || direction == "right") {
-      cards.value[0].index = 1 - cards.value[0].index
-      cards.value[1].index = 1 - cards.value[1].index
+        cards.value.push(first)
     } else if (direction == "top" || direction == "bottom") {
-      const first = cards.value.shift()
-      if (first) {
-        inboxStore.mark(first?.id)
+      inboxStore.mark(first?.id)
 
-        const verseId = first.verse?.number || ""
-        const allReviewd = inboxStore.isAllReviewdByVerse(verseId)
-        if (first.type == InboxTypeCard.text) {
-          reviewStore.addCard(verseId, "text:number")
-          reviewStore.addCard(verseId, "number:text")
-        } else if (first.type == InboxTypeCard.transaltion) {
-          reviewStore.addCard(verseId, "translation:number")
-          reviewStore.addCard(verseId, "number:translation")
-        }
-        if (allReviewd) {
-          reviewStore.addCard(verseId, "translation:text")
-          reviewStore.addCard(verseId, "text:translation")
-        }
+      const verseId = first.verse?.number || ""
+      const allReviewd = inboxStore.isAllReviewdByVerse(verseId)
+      if (first.type == InboxTypeCard.text) {
+        reviewStore.addCard(verseId, "text:number")
+        reviewStore.addCard(verseId, "number:text")
+      } else if (first.type == InboxTypeCard.transaltion) {
+        reviewStore.addCard(verseId, "translation:number")
+        reviewStore.addCard(verseId, "number:translation")
+      }
+      if (allReviewd) {
+        reviewStore.addCard(verseId, "translation:text")
+        reviewStore.addCard(verseId, "text:translation")
       }
     }
 

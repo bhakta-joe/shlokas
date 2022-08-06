@@ -17,7 +17,7 @@
         :key="card.card.id"
         :visible="card.visible"
         :index="reviewCount - idx"
-        :swipe-threshold="settings.minSlideToMarkCard"
+        :swipe-threshold="settings.swipeThreshold"
         @marked="marked"
         @marking="marking"
       >
