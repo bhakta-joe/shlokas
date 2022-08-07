@@ -24,7 +24,7 @@ import interact from 'interactjs';
 import { Target } from '@interactjs/types';
 
 // Vue
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, defineExpose } from 'vue'
 import { defineProps, defineEmits } from 'vue'
 import { onMounted, onBeforeUnmount } from 'vue'
 
@@ -165,6 +165,11 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   disableInteraction()
+})
+
+
+defineExpose({
+  reset
 })
 </script>
 

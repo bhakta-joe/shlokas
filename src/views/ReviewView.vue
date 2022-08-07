@@ -17,6 +17,7 @@
     >
       <FlipCard
         v-for="card, idx in cards"
+        ref="topCard"
         :key="card.card.id"
         :index="idx"
         :swipe-threshold="settings.swipeThreshold"
@@ -150,8 +151,10 @@ import { ref, computed } from 'vue'
 import { settings } from '@/lib/settings'
 import { ReviewCard, useReviewStore } from '@/stores/review';
 import { Verse, getVerse } from '@/lib/verses';
+import { useTimeStore } from '@/stores/time';
 
 const reviewStore = useReviewStore()
+const timeStore = useTimeStore()
 
 interface ReviewCardViewModel {
   card: ReviewCard
@@ -164,6 +167,7 @@ const swipeDirections = ['left', 'right']
 const progress = computed(() => 1 - cards.value.length / reviewCount.value)
 const empty = computed(() => cards.value.length === 0)
 
+const topCard = ref([])
 const cards = ref<ReviewCardViewModel[]>([])
 function updateViewModel() {
   cards.value = reviewStore.readyForReview.map(x => ({
@@ -184,9 +188,14 @@ function onTopCardSwiped({ direction, value }) {
 
     if (first.grade < 0) {
       cards.value.push(first)
+      if (cards.value.length === 1) {
+        (topCard.value[0] as typeof FlipCard).reset()
+      }
     } else {
-      // cards.value.splice(0, 1)
+      first.card.reviewDate.setDate(timeStore.date.getDate() + first.grade)
     }
+
+    first.grade = 0
 
   }, 500)
 }

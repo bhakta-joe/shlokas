@@ -16,7 +16,7 @@
 
         <ion-tab-button
           tab="tab2"
-          href="/tabs/tab2"
+          href="/tabs/review"
         >
           <ion-icon :icon="fileTrayFullOutline" />
           <ion-label>{{ t('review') }}</ion-label>
@@ -27,7 +27,7 @@
 
         <ion-tab-button
           tab="tab3"
-          href="/tabs/tab3"
+          href="/tabs/settings"
         >
           <ion-icon :icon="cogOutline" />
           <ion-label>{{ t('settings') }}</ion-label>
