@@ -46,7 +46,7 @@ import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, toastC
 import { useTimeStore } from '@/stores/time'
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { db, auth, dbError } from '@/services/data'
-import {  createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { ref } from 'vue'
 
 const timeStore = useTimeStore()
@@ -74,6 +74,7 @@ async function addRecord() {
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
     console.error("Error adding document: ", e);
+    await show('??? ' + e)
     // await show(e.toStr)
   }
 }
@@ -95,20 +96,15 @@ async function register() {
     });
 }
 
-function logIn() {
-  signInWithEmailAndPassword(auth, "a@a.com", "pwd123")
-  .then(async (userCredential) => {
-    // Signed in
+async function logIn() {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, "a@a.com", "pwd123")
     const user = userCredential.user;
     show('log in' + user)
     // ...
-  })
-  .catch(async (error) => {
-    // const errorCode = error.code;
-    // const errorMessage = error.message;
-    // console.log(error)
-    await show(error)
-  });
+  } catch (error) {
+    await show("??" + error)
+  }
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -126,10 +122,10 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 async function show(message: string) {
-    const toast = await toastController.create({
-      message: message,
-      duration: 2000
-    })
-    await toast.present()
+  const toast = await toastController.create({
+    message: message,
+    duration: 2000
+  })
+  await toast.present()
 }
 </script>
