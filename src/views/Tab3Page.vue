@@ -45,8 +45,8 @@
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, toastController } from '@ionic/vue'
 import { useTimeStore } from '@/stores/time'
 import { collection, addDoc, getDocs } from "firebase/firestore";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { db, dbError } from '@/services/data'
+import { db, auth, dbError } from '@/services/data'
+import {  createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { ref } from 'vue'
 
 const timeStore = useTimeStore()
@@ -78,7 +78,7 @@ async function addRecord() {
   }
 }
 
-const auth = getAuth();
+// const auth = getAuth();
 async function register() {
   createUserWithEmailAndPassword(auth, "a@a.com", "pwd123")
     .then(async (userCredential) => {
@@ -95,12 +95,12 @@ async function register() {
     });
 }
 
-async function logIn() {
+function logIn() {
   signInWithEmailAndPassword(auth, "a@a.com", "pwd123")
   .then(async (userCredential) => {
     // Signed in
     const user = userCredential.user;
-    await show('log in' + user)
+    show('log in' + user)
     // ...
   })
   .catch(async (error) => {
