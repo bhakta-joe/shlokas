@@ -40,7 +40,7 @@
             class="front"
           >
             <div class="number">
-              {{ card.verse.number }}
+              {{ card.verse.number.title }}
             </div>
             <VerseLines :text="card.verse.text || ''" />
           </div>
@@ -74,7 +74,7 @@
 <script lang="ts" setup>
 import {
   IonPage, IonHeader, IonToolbar, IonContent, IonTitle,
-  IonButtons, IonButton, modalController
+  IonButtons, IonButton, modalController, onIonViewDidEnter
 } from '@ionic/vue';
 
 import InboxEmpty from '@/components/inbox/InboxEmpty.vue'
@@ -87,11 +87,15 @@ import { settings } from '@/lib/settings'
 import { useInboxStore } from '@/stores/inbox'
 import { useReviewStore } from '@/stores/review'
 import { InboxTypeCard } from '@/stores/inbox'
-import { Verse, getVerse } from '@/lib/verses'
+// import { Verse, getVerse } from '@/lib/verses'
 import { useI18n } from 'vue-i18n'
 import InboxCardProgressOverlay from '@/components/inbox/cards/InboxCardProgressOverlay.vue'
 import WordByWordTranslationSide from '@/components/inbox/cards/WordByWordTranslationSide.vue'
+import { useVersesStore } from '@/stores/verses';
+import { Verse } from '@/domain/models/verse';
+// import { VersesRepository } from '@/services/data/verses';
 
+const versesStore = useVersesStore()
 const inboxStore = useInboxStore()
 const reviewStore = useReviewStore()
 const { t } = useI18n()
@@ -113,7 +117,7 @@ function updateViewModel() {
   cards.value = inboxStore.readyForReview.map(x => ({
     id: x.id,
     type: x.type,
-    verse: getVerse(x.verseId),
+    verse: versesStore.byId(x.verseId),
     progress: ""
   }))
 }
@@ -156,6 +160,9 @@ function onTopCardSwiped({ direction }) {
 
 
 async function openModal() {
+  if (useVersesStore().all.length === 0) {
+    await useVersesStore().load()
+  }
   const modal = await modalController.create({
     component: InboxAddVerseDialog,
   });

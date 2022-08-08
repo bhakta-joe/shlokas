@@ -1,4 +1,8 @@
 import { defineStore } from 'pinia'
+import { collection, addDoc, getDocs } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
+import { Verse } from '@/domain/models/verse';
+
 
 export enum InboxTypeCard {
   text,
@@ -22,10 +26,26 @@ export const useInboxStore = defineStore('inbox', {
     } as InboxState
   },
   actions: {
-    addCard(type: InboxTypeCard, verseId: string) {
+    // async load() {
+    //   const db = getFirestore()
+    //   const querySnapshot = await getDocs(collection(db, "inbox"))
+    //   this.cards = []
+    //   querySnapshot.forEach((doc) => {
+    //     const obj = {
+    //       id: doc.id,
+    //       type: doc.data().type,
+    //       verseId: doc.data().verseId
+    //     } as InboxCard
+    //     this.cards.push(obj)
+    //     console.log(obj)
+    //     // console.log(`${doc.id} => doc.data()}`);
+    //   })
+    //   console.log(this.cards)
+    // },
+    addCard(type: InboxTypeCard, verse: Verse) {
       const r = (Math.random() + 1).toString(36).substring(7);
 
-      this.cards.push({type, verseId, id: r})
+      this.cards.push({type, verseId: verse.id, id: r})
     },
     mark(id: string) {
       const idx = this.cards.findIndex(c => c.id === id)
