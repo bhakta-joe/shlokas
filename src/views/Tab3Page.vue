@@ -98,19 +98,18 @@ async function register() {
 }
 
 
-async function logIn() {
+function logIn() {
   console.log("------")
-  try {
     console.log("123")
-    const userCredential = await signInWithEmailAndPassword(auth, "a@a.com", "pwd123")
-    console.log("aaa")
-    const user = userCredential.user;
-    console.log(user)
-    show('log in' + user)
-    // ...
-  } catch (error) {
-    await show("??" + error)
-  }
+    signInWithEmailAndPassword(auth, "a@a.com", "pwd123").then((uc) => {
+      console.log("aaa")
+      const user = uc.user;
+      console.log(user)
+      // show('log in' + user)
+    }).catch((error) => {
+      console.log(error)
+      // show("??" + error)
+    })
 }
 
 onAuthStateChanged(auth, async (user) => {
