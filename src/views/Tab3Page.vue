@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts" setup>
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton } from '@ionic/vue'
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, toastController } from '@ionic/vue'
 import { useTimeStore } from '@/stores/time'
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
@@ -74,49 +74,62 @@ async function addRecord() {
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
     console.error("Error adding document: ", e);
+    // await show(e.toStr)
   }
 }
 
 const auth = getAuth();
 async function register() {
   createUserWithEmailAndPassword(auth, "a@a.com", "pwd123")
-    .then((userCredential) => {
+    .then(async (userCredential) => {
       // Signed in
       const user = userCredential.user;
       console.log(user)
+      // await show(user)
     })
-    .catch((error) => {
+    .catch(async (error) => {
       // const errorCode = error.code;
       // const errorMessage = error.message;
       console.log(error)
+      await show(error)
     });
 }
 
-function logIn() {
+async function logIn() {
   signInWithEmailAndPassword(auth, "a@a.com", "pwd123")
-  .then((userCredential) => {
+  .then(async (userCredential) => {
     // Signed in
     const user = userCredential.user;
-    console.log(user)
+    await show('log in' + user)
     // ...
   })
-  .catch((error) => {
+  .catch(async (error) => {
     // const errorCode = error.code;
     // const errorMessage = error.message;
-    console.log(error)
+    // console.log(error)
+    await show(error)
   });
 }
 
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   if (user) {
     // User is signed in, see docs for a list of available properties
     // https://firebase.google.com/docs/reference/js/firebase.User
     const uid = user.uid;
-    console.log(uid)
+    await show('Authenticated')
     // ...
   } else {
+    await show('Not authenticated')
     // User is signed out
     // ...
   }
 });
+
+async function show(message: string) {
+    const toast = await toastController.create({
+      message: message,
+      duration: 2000
+    })
+    await toast.present()
+}
 </script>
