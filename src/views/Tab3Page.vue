@@ -72,6 +72,7 @@ async function addRecord() {
       due: new Date()
     });
     console.log("Document written with ID: ", docRef.id);
+    await show('??? ' + docRef.id)
   } catch (e) {
     console.error("Error adding document: ", e);
     await show('??? ' + e)
@@ -96,10 +97,15 @@ async function register() {
     });
 }
 
+
 async function logIn() {
+  console.log("------")
   try {
+    console.log("123")
     const userCredential = await signInWithEmailAndPassword(auth, "a@a.com", "pwd123")
+    console.log("aaa")
     const user = userCredential.user;
+    console.log(user)
     show('log in' + user)
     // ...
   } catch (error) {
@@ -109,15 +115,9 @@ async function logIn() {
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    // User is signed in, see docs for a list of available properties
-    // https://firebase.google.com/docs/reference/js/firebase.User
-    const uid = user.uid;
     await show('Authenticated')
-    // ...
   } else {
     await show('Not authenticated')
-    // User is signed out
-    // ...
   }
 });
 
