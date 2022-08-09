@@ -45,7 +45,7 @@
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, toastController } from '@ionic/vue'
 import { useTimeStore } from '@/stores/time'
 import { collection, addDoc, getDocs } from "firebase/firestore";
-import { db, dbError } from '@/services/data'
+import { db, dbError, auth } from '@/services/data'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { ref } from 'vue'
 
@@ -80,7 +80,7 @@ async function addRecord() {
   }
 }
 
-// // const auth = getAuth();
+// const auth = getAuth();
 // async function register() {
 //   createUserWithEmailAndPassword(auth, "a@a.com", "pwd123")
 //     .then(async (userCredential) => {
@@ -98,27 +98,25 @@ async function addRecord() {
 // }
 
 
-// function logIn() {
-//   console.log("------")
-//     console.log("123")
-//     signInWithEmailAndPassword(auth, "a@a.com", "pwd123").then((uc) => {
-//       console.log("aaa")
-//       const user = uc.user;
-//       console.log(user)
-//       // show('log in' + user)
-//     }).catch((error) => {
-//       console.log(error)
-//       // show("??" + error)
-//     })
-// }
+function logIn() {
+    signInWithEmailAndPassword(auth, "a@a.com", "pwd123").then((uc) => {
+      const user = uc.user;
+      console.log(user)
+      show("Yeah!")
+      // show('log in' + user)
+    }).catch((error) => {
+      console.log(error)
+      // show("??" + error)
+    })
+}
 
-// onAuthStateChanged(auth, async (user) => {
-//   if (user) {
-//     await show('Authenticated')
-//   } else {
-//     await show('Not authenticated')
-//   }
-// });
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    await show('Authenticated')
+  } else {
+    await show('Not authenticated')
+  }
+});
 
 async function show(message: string) {
   const toast = await toastController.create({
