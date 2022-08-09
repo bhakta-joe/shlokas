@@ -30,7 +30,7 @@ export class VersesRepository {
     })
   }
 
-  private map(id: string, data: DbVerse) : Verse {
+  private map(id: string, data: DbVerse): Verse {
     return new Verse(
       id, new VerseNumber(data.number.bookId, data.number.numbers),
       data.text, data.translation, data.langId

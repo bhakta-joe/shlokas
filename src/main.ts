@@ -3,6 +3,7 @@ import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router';
+import { app as HerApp } from '@/services/firebase'
 
 import { IonicVue } from '@ionic/vue';
 
@@ -38,6 +39,9 @@ const app = createApp(App)
   .use(IonicVue)
   .use(router)
   .use(i18n)
+
+/* Firebase */
+// setupFirebase()
 
 router.isReady().then(() => {
   app.mount('#app');

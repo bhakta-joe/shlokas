@@ -74,7 +74,7 @@
 <script lang="ts" setup>
 import {
   IonPage, IonHeader, IonToolbar, IonContent, IonTitle,
-  IonButtons, IonButton, modalController, onIonViewDidEnter
+  IonButtons, IonButton, modalController,
 } from '@ionic/vue';
 
 import InboxEmpty from '@/components/inbox/InboxEmpty.vue'
